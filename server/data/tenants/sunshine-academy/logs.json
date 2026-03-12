@@ -1,1 +1,53 @@
-{ "tenantId": "sunshine-academy", "logs": [] }
+{
+  "tenantId": "sunshine-academy",
+  "logs": [
+    {
+      "id": "96b8192f-f6b4-43b3-bd30-5a29da4a128d",
+      "tenantId": "sunshine-academy",
+      "question": "how much does it cost?",
+      "answer": "The fees for enrollment in our programs are based on a graduated fee schedule determined by family income and the number of family members. There is an additional fee for siblings and fees for NM Pre-K Extended Care. Fees are minimal, non-refundable, and there is no daily pro-rating of fees. Depending on the program chosen, established/required fees must be paid in advance of services. If you are using state subsidy, documentation of a state subsidy contract is required at enrollment. Please contact the enrollment office for more detailed information about the specific cost for your situation.",
+      "timestamp": "2026-03-12T21:59:27.921Z",
+      "wasUncertain": false
+    },
+    {
+      "id": "8b40cdfe-e22d-45ac-963d-948ff9cb3af1",
+      "tenantId": "sunshine-academy",
+      "question": "What does tuition look like?",
+      "answer": "The fees for the program are minimal, non-refundable, and there is no daily pro-rating of fees. All families enrolled in the program will have an established fee based on a graduated fee schedule determined by family income and number of family members. There is an additional fee for siblings and fees for NM Pre-K Extended Care. Fees must be paid in advance of services, regardless of attendance. If you are using state subsidy, documentation of a state subsidy contract is required at enrollment. If the parent is seeking state subsidy, the City of Albuquerque established fee will be in place until your state contract is approved. Once the subsidy copay is in place, it will be your new fee until the state contract expires. As soon as your contract expires, the established weekly fee will be reinstated. If you are late picking up your child and arrive at the center after it is closed, you will incur a late fee of $15.00 per occurrence.",
+      "timestamp": "2026-03-12T22:00:21.304Z",
+      "wasUncertain": false
+    },
+    {
+      "id": "080fd1db-f964-40ef-a2ce-de25aefb9bf0",
+      "tenantId": "sunshine-academy",
+      "question": "What does sick policy look like?",
+      "answer": "If your child is sick, it's important to keep them at home until they are no longer at risk. Children should stay home if they have a fever of 100.4°F or higher, have vomited or had diarrhea in the past 24 hours, have pink eye, a cloudy runny nose, have been on antibiotics for less than 24 hours, have symptoms of contagious diseases, or have an undiagnosed rash. If your child shows any of these symptoms at the center, you will be called to pick them up as soon as possible. A doctor's note may be required for your child to return to the center. Please help protect everyone by having your child wash their hands upon arrival and departure. If you have concerns or questions, please contact the front desk directly.",
+      "timestamp": "2026-03-12T22:01:05.013Z",
+      "wasUncertain": true
+    },
+    {
+      "id": "ad0c220e-ec5f-4fc8-8e3b-b25e85c89b2e",
+      "tenantId": "sunshine-academy",
+      "question": "my kid has a runny nose, can they come in?",
+      "answer": "If your child's runny nose is not clear and is cloudy, it's best to keep them at home. This helps protect other children and staff from potential illness. If you have any concerns or need further clarification, please contact the front desk directly.",
+      "timestamp": "2026-03-12T22:01:47.795Z",
+      "wasUncertain": true
+    },
+    {
+      "id": "9902851c-a387-431a-81ea-6381a8514a60",
+      "tenantId": "sunshine-academy",
+      "question": "what are your hours?",
+      "answer": "Here are the hours for our programs:\n\n- **Early Head Start (Ages 0-3):** \n  - Child Development Center Hours: 8:00 am - 4:30 pm or 7:00 am - 5:30 pm.\n  - Program Hours: 8:00 am - 2:30 pm.\n  - CABQ Extended Care: Before and after the program day.\n\n- **Preschool and NM Pre-K (Ages 3-5):**\n  - Child Development Center Hours: 7:00 am - 5:30 pm or 8:00 am - 4:30 pm.\n  - Preschool Program Hours: 7:00 am - 5:30 pm or 8:00 am - 4:30 pm.\n  - NM Pre-K Program Hours: 8:00 am - 2:30 pm.\n  - CABQ Extended Care for NM Pre-K: Before and after the program day.\n\nPlease let me know if you need more details!",
+      "timestamp": "2026-03-12T22:24:52.457Z",
+      "wasUncertain": false
+    },
+    {
+      "id": "f9e4bfda-61ee-4cf3-8d48-2db8f82beca8",
+      "tenantId": "sunshine-academy",
+      "question": "can my child go in if they have a runny nose?",
+      "answer": "If your child has a runny nose that is cloudy, not clear, it is advised to keep them at home. This helps protect other children and staff from potential illness. If the runny nose is due to a contagious condition, please ensure your child stays home until they are no longer at risk of spreading it. If in doubt, it's always a good idea to consult with your child's teacher or a healthcare professional.",
+      "timestamp": "2026-03-12T22:25:33.259Z",
+      "wasUncertain": false
+    }
+  ]
+}
