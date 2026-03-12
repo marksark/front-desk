@@ -11,10 +11,27 @@ function getHandbookPath(tenantId: string): string {
   return path.join(getTenantDir(tenantId), "handbook.txt");
 }
 
+function compressText(text: string): string {
+  return text
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/(\w)-\n(\w)/g, "$1$2")
+    .replace(/\f/g, "\n")
+    .replace(/^\s*[-•]\s*/gm, "- ")
+    .replace(/\b(\w+)( \1\b)+/gi, "$1")
+    .trim();
+}
+
+function removeBoilerplate(text: string): string {
+  const contentStart = text.indexOf("PROGRAM OVERVIEW");
+  return contentStart > -1 ? text.slice(contentStart) : text;
+}
+
 export async function saveHandbook(tenantId: string, text: string): Promise<void> {
   const tenantDir = getTenantDir(tenantId);
+  const cleaned = compressText(removeBoilerplate(text));
   await mkdir(tenantDir, { recursive: true });
-  await writeFile(getHandbookPath(tenantId), text, "utf-8");
+  await writeFile(getHandbookPath(tenantId), cleaned, "utf-8");
 }
 
 export async function getHandbookText(tenantId: string): Promise<string | null> {
