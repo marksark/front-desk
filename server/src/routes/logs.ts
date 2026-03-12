@@ -43,6 +43,12 @@ async function writeTenantLogs(tenantId: string, data: TenantLogsFile): Promise<
   await writeFile(getLogsFilePath(tenantId), JSON.stringify(data, null, 2), "utf-8");
 }
 
+export async function appendLog(tenantId: string, logEntry: LogEntry): Promise<void> {
+  const logsData = await readTenantLogs(tenantId);
+  logsData.logs.push(logEntry);
+  await writeTenantLogs(tenantId, logsData);
+}
+
 router.get("/:tenantId", async (req, res) => {
   const { tenantId } = req.params;
   const logsData = await readTenantLogs(tenantId);
@@ -72,9 +78,7 @@ router.post("/:tenantId", async (req, res) => {
     wasUncertain: body.wasUncertain
   };
 
-  const logsData = await readTenantLogs(tenantId);
-  logsData.logs.push(logEntry);
-  await writeTenantLogs(tenantId, logsData);
+  await appendLog(tenantId, logEntry);
 
   return res.status(201).json(logEntry);
 });

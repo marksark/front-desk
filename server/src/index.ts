@@ -1,5 +1,7 @@
+import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import chatRoutes from "./routes/chat";
 import handbookRoutes from "./routes/handbook";
 import logsRoutes from "./routes/logs";
 
@@ -13,6 +15,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/api/chat", chatRoutes);
 app.use("/api/handbook", handbookRoutes);
 app.use("/api/logs", logsRoutes);
 
