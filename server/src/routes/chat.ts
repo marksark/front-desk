@@ -13,7 +13,7 @@ interface ChatRequestBody {
 const router = Router();
 
 const UNCERTAIN_RESPONSE =
-  "I'm not sure about that — please contact the front desk directly for the most accurate information.";
+  "I'm not sure about that — please contact the front desk directly for the most accurate information about your inquiry.";
 
 router.post("/", async (req, res) => {
   const body = req.body as Partial<ChatRequestBody>;
@@ -63,7 +63,7 @@ router.post("/", async (req, res) => {
   
   WHEN YOU DON'T KNOW:
   - If after a genuine search of the handbook the answer truly is not 
-    there, respond with exactly: "${UNCERTAIN_RESPONSE}"
+    there, respond with exactly: "${UNCERTAIN_RESPONSE}".
   - Do not use this as a shortcut. Exhaust synonyms and related 
     concepts before giving up.
   - If the question is sensitive (health, safety, legal), answer 
