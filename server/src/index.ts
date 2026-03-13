@@ -1,19 +1,22 @@
-// only load .env file in local dev
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config()
-}
 import cors from "cors";
 import express from "express";
 import chatRoutes from "./routes/chat";
 import handbookRoutes from "./routes/handbook";
 import logsRoutes from "./routes/logs";
 
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 const app = express();
-const port = 3001;
 
 app.use(
   cors({
-    origin: "http://localhost:3000"
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      /\.vercel\.app$/,
+    ]
   })
 );
 
@@ -26,9 +29,9 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(port, () => {
-    console.log(`Server listening on http://localhost:${port}`);
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(3001, () => {
+    console.log(`Server listening on http://localhost:3001`);
   });
 }
 
