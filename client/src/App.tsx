@@ -5,7 +5,7 @@ import LandingPage from "./pages/LandingPage";
 import { OperatorPage } from "./pages/OperatorPage";
 
 const TENANT_ID = "sunshine-academy";
-const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:3001`;
+const API_BASE_URL = '';
 const CHAT_ENDPOINT = `${API_BASE_URL}/api/chat`;
 const HANDBOOK_STATUS_ENDPOINT = `${API_BASE_URL}/api/handbook/${TENANT_ID}/status`;
 const HANDBOOK_UPLOAD_ENDPOINT = `${API_BASE_URL}/api/handbook/upload`;
