@@ -38,6 +38,10 @@ async function readTenantLogs(tenantId: string): Promise<TenantLogsFile> {
 }
 
 async function writeTenantLogs(tenantId: string, data: TenantLogsFile): Promise<void> {
+  if (process.env.VERCEL === "1") {
+    return;
+  }
+
   const tenantDir = getTenantDir(tenantId);
   await mkdir(tenantDir, { recursive: true });
   await writeFile(getLogsFilePath(tenantId), JSON.stringify(data, null, 2), "utf-8");
