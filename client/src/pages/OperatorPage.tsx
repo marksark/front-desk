@@ -104,6 +104,7 @@ export function OperatorPage({
             {activeTab === "handbook" ? (
               <div className="operator-section">
                 <h2>Handbook</h2>
+                <h5><strong> Uploads are disabled in the hosted demo. Run locally to manage your handbook. </strong></h5>
                 {isHandbookLoading ? <p>Loading handbook status...</p> : null}
                 {handbookError ? <p className="operator-error">{handbookError}</p> : null}
                 {handbookNotice ? <p className="operator-success">{handbookNotice}</p> : null}
@@ -130,7 +131,7 @@ export function OperatorPage({
 
                 {!isHandbookLoading && handbookExists ? (
                   <div className="handbook-actions">
-                    <p>✅ Handbook loaded — {handbookCharCount} characters</p>
+                    <p>Handbook loaded — {handbookCharCount} characters</p>
                     <div className="inline-actions">
                       <button
                         type="button"
@@ -196,7 +197,7 @@ export function OperatorPage({
             ) : null}
           </section>
         </section>
-      </main>
+      </main >
       <a className="persistent-nav-button" href={persistentNavTarget.href}>
         {persistentNavTarget.label}
       </a>
