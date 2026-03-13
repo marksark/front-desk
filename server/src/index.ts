@@ -1,4 +1,7 @@
-import "dotenv/config";
+// only load .env file in local dev
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 import cors from "cors";
 import express from "express";
 import chatRoutes from "./routes/chat";
