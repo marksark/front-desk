@@ -1,6 +1,7 @@
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import { ChatPage } from "./pages/ChatPage";
+import LandingPage from "./pages/LandingPage";
 import { OperatorPage } from "./pages/OperatorPage";
 
 const TENANT_ID = "sunshine-academy";
@@ -87,6 +88,7 @@ function App() {
   const [isLogsLoading, setIsLogsLoading] = useState(false);
 
   const routePath = useMemo(() => window.location.pathname, []);
+  const isLandingRoute = routePath === "/";
   const isChatRoute = routePath === "/chat";
   const isOperatorRoute = routePath === "/operator";
   const persistentNavTarget = isOperatorRoute
@@ -360,6 +362,10 @@ function App() {
         onRemoveHandbook={handleRemoveHandbook}
       />
     );
+  }
+
+  if (isLandingRoute) {
+    return <LandingPage />;
   }
 
   if (!isChatRoute) {

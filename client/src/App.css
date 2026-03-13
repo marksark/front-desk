@@ -211,6 +211,81 @@ body,
   justify-content: center;
 }
 
+.landing-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at top, #fff3dc 0%, #f8eddc 45%, #f5e6d1 100%);
+  color: #2d2d2d;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Helvetica Neue", sans-serif;
+}
+
+.landing-card {
+  width: min(520px, 100%);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #ecdac0;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(120, 94, 51, 0.12);
+  padding: 34px 26px;
+  text-align: center;
+}
+
+.landing-card h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  color: #5e4426;
+}
+
+.landing-card p {
+  margin: 12px auto 0;
+  max-width: 36ch;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: #4f4a44;
+}
+
+.landing-actions {
+  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+}
+
+.landing-button {
+  display: block;
+  border-radius: 12px;
+  text-decoration: none;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.landing-button:hover {
+  transform: translateY(-1px);
+}
+
+.landing-button.parent {
+  background: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(245, 158, 11, 0.25);
+}
+
+.landing-button.parent:hover {
+  background: #d99006;
+}
+
+.landing-button.staff {
+  background: #ffffff;
+  border: 1px solid #d8c5aa;
+  color: #4f3a21;
+}
+
+.landing-button.staff:hover {
+  background: #fff8ee;
+}
+
 .persistent-nav-button {
   position: fixed;
   right: 16px;
