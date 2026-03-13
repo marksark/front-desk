@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import path from "path";
 import chatRoutes from "./routes/chat";
 import handbookRoutes from "./routes/handbook";
 import logsRoutes from "./routes/logs";
@@ -28,6 +29,14 @@ app.use("/api/logs", logsRoutes);
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
+
+// serve static client files
+app.use(express.static(path.join(__dirname, '../../client/dist')))
+
+// catch-all for React Router
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../../client/dist/index.html'))
+})
 
 if (process.env.NODE_ENV !== 'production') {
   app.listen(3001, () => {
