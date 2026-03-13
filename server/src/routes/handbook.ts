@@ -1,10 +1,17 @@
 import { Router } from "express";
 import multer from "multer";
-import { PDFParse } from "pdf-parse";
 import { deleteHandbook, getHandbookStatus, saveHandbook } from "../lib/handbookStore";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
+
+// needed to import pdf-parse dynamically to avoid build errors on vercel only; wouldn't do this otherwise...
+async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  const { PDFParse } = await import("pdf-parse");
+  const parser = new PDFParse({ data: buffer });
+  const data = await parser.getText();
+  return data.text;
+}
 
 const WORD_MIME_TYPES = new Set([
   "application/msword",
@@ -30,10 +37,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
 
   let extractedText: string;
   if (mimetype === "application/pdf") {
-    const parser = new PDFParse({ data: file.buffer });
-    const parsedPdf = await parser.getText();
-    extractedText = parsedPdf.text;
-    await parser.destroy();
+    extractedText = await extractTextFromPDF(file.buffer);
   } else if (mimetype === "text/plain") {
     extractedText = file.buffer.toString("utf-8");
   } else {
