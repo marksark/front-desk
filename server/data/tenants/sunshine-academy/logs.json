@@ -1,4 +1,13 @@
 {
   "tenantId": "sunshine-academy",
-  "logs": []
+  "logs": [
+    {
+      "id": "225ae75a-593b-40e2-9390-7fff717596d1",
+      "tenantId": "sunshine-academy",
+      "question": "test",
+      "answer": "I'm not sure about that — please contact the front desk directly for the most accurate information.",
+      "timestamp": "2026-03-13T16:33:20.782Z",
+      "wasUncertain": true
+    }
+  ]
 }
