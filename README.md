@@ -1,7 +1,7 @@
 # AI Front Desk (POC)
 
 A lightweight AI-powered front desk prototype for early education centers.
-Parents ask questions, Claude answers from the school's uploaded handbook.
+Parents ask questions, AI answers from the school's uploaded handbook.
 
 ## Setup
 1. Clone the repo
