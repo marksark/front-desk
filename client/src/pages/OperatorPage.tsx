@@ -1,4 +1,5 @@
-import { ChangeEvent, ChangeEventHandler, RefObject } from "react";
+import { ChangeEvent, ChangeEventHandler, FormEvent, RefObject, useState } from "react";
+import type { Tenant } from "../tenant/TenantContext";
 
 type OperatorTab = "handbook" | "questionLog";
 
@@ -22,6 +23,11 @@ interface PersistentNavTarget {
 
 interface OperatorPageProps {
   tenantId: string;
+  tenants: Tenant[];
+  isTenantsLoading: boolean;
+  tenantsError: string | null;
+  onTenantChange: (id: string) => void;
+  onAddTenant: (id: string) => Promise<Tenant>;
   activeTab: OperatorTab;
   handbookStatus: HandbookStatus | null;
   selectedHandbookFile: File | null;
@@ -46,6 +52,11 @@ interface OperatorPageProps {
 
 export function OperatorPage({
   tenantId,
+  tenants,
+  isTenantsLoading,
+  tenantsError,
+  onTenantChange,
+  onAddTenant,
   activeTab,
   handbookStatus,
   selectedHandbookFile,
@@ -70,13 +81,75 @@ export function OperatorPage({
   const handbookExists = Boolean(handbookStatus?.exists);
   const handbookCharCount = handbookStatus?.charCount ?? 0;
 
+  const [newTenantId, setNewTenantId] = useState("");
+  const [addTenantError, setAddTenantError] = useState<string | null>(null);
+  const [isAddingTenant, setIsAddingTenant] = useState(false);
+
+  const hasKnownTenant = tenants.some((tenant) => tenant.id === tenantId);
+  const dropdownOptions = hasKnownTenant ? tenants : [{ id: tenantId }, ...tenants];
+
+  const handleAddTenant = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = newTenantId.trim();
+    if (!trimmed || isAddingTenant) {
+      return;
+    }
+
+    setIsAddingTenant(true);
+    setAddTenantError(null);
+
+    try {
+      await onAddTenant(trimmed);
+      setNewTenantId("");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to create tenant.";
+      setAddTenantError(message);
+    } finally {
+      setIsAddingTenant(false);
+    }
+  };
+
   return (
     <>
       <main className="operator-page">
         <section className="operator-shell">
           <header className="operator-header">
             <h1>Operator Dashboard</h1>
-            <p>Tenant: {tenantId}</p>
+            <div className="operator-tenant-controls">
+              <label className="operator-tenant-label">
+                <span>Tenant:</span>
+                <select
+                  className="operator-tenant-select"
+                  value={tenantId}
+                  onChange={(event) => onTenantChange(event.target.value)}
+                  disabled={isTenantsLoading}
+                >
+                  {dropdownOptions.map((tenant) => (
+                    <option key={tenant.id} value={tenant.id}>
+                      {tenant.id}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <form className="operator-add-tenant" onSubmit={handleAddTenant}>
+                <input
+                  type="text"
+                  placeholder="new-tenant-id"
+                  value={newTenantId}
+                  onChange={(event) => setNewTenantId(event.target.value)}
+                  disabled={isAddingTenant}
+                  aria-label="New tenant id"
+                />
+                <button
+                  type="submit"
+                  disabled={isAddingTenant || newTenantId.trim().length === 0}
+                >
+                  {isAddingTenant ? "Adding..." : "Add tenant"}
+                </button>
+              </form>
+            </div>
+            {tenantsError ? <p className="operator-error">{tenantsError}</p> : null}
+            {addTenantError ? <p className="operator-error">{addTenantError}</p> : null}
             <p>
               <a href="/admin/form-builder">Open JSON Form Builder</a>
             </p>
