@@ -406,7 +406,7 @@ function App() {
         <div className="route-links">
           <a href="/chat">Go to parent chat</a>
           <a href="/operator">Go to operator dashboard</a>
-          <a href="/admin/form-builder">JSON form builder</a>
+          <a href="/admin/form-builder">Go to intake form builder</a>
         </div>
       </div>
     );

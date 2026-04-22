@@ -151,7 +151,7 @@ export function OperatorPage({
             {tenantsError ? <p className="operator-error">{tenantsError}</p> : null}
             {addTenantError ? <p className="operator-error">{addTenantError}</p> : null}
             <p>
-              <a href="/admin/form-builder">Open JSON Form Builder</a>
+              <a href="/admin/form-builder">Open Intake Form Builder</a>
             </p>
           </header>
 

@@ -83,7 +83,7 @@ function FormBuilderApp({ formTemplate, tenantId }) {
   };
 
   const handleSave = () => {
-    dispatch(setShowSchemaPreview());
+    // dispatch(setShowSchemaPreview());
   };
 
   const toggleAccordion = (panel) => (event, expanded) => {

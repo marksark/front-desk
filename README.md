@@ -3,7 +3,7 @@
 ### Description
 
 A lightweight, mobile-friendly AI front desk prototype for early education centers.
-Parents ask questions in natural language. The AI answers instantly from the school's uploaded handbook — never guessing, never fabricating policy.
+Parents ask questions in natural language. The AI answers instantly from the school's uploaded handbook — never guessing, never fabricating policy. Early education centers are able to build a custom intake form to share with prospective new parents.
 
 **Live demo:** https://ms-front-desk-app.vercel.app (note limitations of arch here vs local repo)
 
@@ -13,6 +13,7 @@ Parents ask questions in natural language. The AI answers instantly from the sch
 
 - **Parent Chat UI** — mobile-optimized chat at `/chat`
 - **Operator Dashboard** — handbook management + question logs at `/operator`
+- **Intake Form Builder** — Intake form for schools at `/admin/form-builder`
 - **Handbook Upload** — upload any PDF or .txt file as the knowledge base
 - **Graceful Uncertainty** — uncertain answers flagged and logged for review
 - **Tenant-aware** — data model supports multiple schools by design
@@ -64,6 +65,7 @@ Server runs at `http://localhost:3001`
 2. Upload your school's handbook (PDF or .txt)
 3. View all questions asked in the Question Log tab
 4. Replace or remove the handbook at any time
+5. Create or update intake form for prospective parents
 
 ---
 

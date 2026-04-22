@@ -9,7 +9,7 @@ export function FormBuilderPage() {
     <Container maxWidth="xl">
       <Box sx={{ my: 4 }}>
         <Typography variant="h2" component="h1" gutterBottom>
-          JSON Form Builder
+          Intake Form Builder
         </Typography>
         <Typography variant="h6" component="h2" gutterBottom>
           Drag and drop form builder
