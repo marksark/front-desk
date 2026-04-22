@@ -1,6 +1,8 @@
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
+import { FormBuilderProviders } from "./form-builder/FormBuilderProviders";
 import { ChatPage } from "./pages/ChatPage";
+import { FormBuilderPage } from "./pages/FormBuilderPage";
 import LandingPage from "./pages/LandingPage";
 import { OperatorPage } from "./pages/OperatorPage";
 
@@ -91,9 +93,12 @@ function App() {
   const isLandingRoute = routePath === "/";
   const isChatRoute = routePath === "/chat";
   const isOperatorRoute = routePath === "/operator";
-  const persistentNavTarget = isOperatorRoute
-    ? { href: "/chat", label: "Go to Parent Chat" }
-    : { href: "/operator", label: "Go to Operator Dashboard" };
+  const isFormBuilderRoute = routePath === "/admin/form-builder";
+  const persistentNavTarget = isFormBuilderRoute
+    ? { href: "/operator", label: "Back to Operator Dashboard" }
+    : isOperatorRoute
+      ? { href: "/chat", label: "Go to Parent Chat" }
+      : { href: "/operator", label: "Go to Operator Dashboard" };
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -336,6 +341,17 @@ function App() {
     await sendQuestion(draft);
   };
 
+  if (isFormBuilderRoute) {
+    return (
+      <FormBuilderProviders>
+        <FormBuilderPage />
+        <a className="persistent-nav-button" href={persistentNavTarget.href}>
+          {persistentNavTarget.label}
+        </a>
+      </FormBuilderProviders>
+    );
+  }
+
   if (isOperatorRoute) {
     return (
       <OperatorPage
@@ -371,10 +387,11 @@ function App() {
   if (!isChatRoute) {
     return (
       <div className="route-fallback">
-        <p>This app has screens at /chat and /operator.</p>
+        <p>This app has screens at /chat, /operator, and /admin/form-builder.</p>
         <div className="route-links">
           <a href="/chat">Go to parent chat</a>
           <a href="/operator">Go to operator dashboard</a>
+          <a href="/admin/form-builder">JSON form builder</a>
         </div>
       </div>
     );

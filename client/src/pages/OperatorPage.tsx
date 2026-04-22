@@ -77,6 +77,9 @@ export function OperatorPage({
           <header className="operator-header">
             <h1>Operator Dashboard</h1>
             <p>Tenant: {tenantId}</p>
+            <p>
+              <a href="/admin/form-builder">Open JSON Form Builder</a>
+            </p>
           </header>
 
           <div className="operator-tabs" role="tablist" aria-label="Operator tabs">
