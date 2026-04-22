@@ -46,7 +46,9 @@ import {
 } from "../store/slice";
 import "../styles/formBuilder.css";
 
-function FormBuilderApp({ formTemplate }) {
+function FormBuilderApp({ formTemplate, tenantId }) {
+  // tenantId is currently informational; persistence wiring will use it later.
+  void tenantId;
   const [isExpanded, setIsExpanded] = useState(
     formTemplate?.id ? false : "panel1"
   );
@@ -261,6 +263,7 @@ function FormBuilderApp({ formTemplate }) {
 
 FormBuilderApp.propTypes = {
   formTemplate: PropTypes.any, // TOOD: Define a more specific type
+  tenantId: PropTypes.string,
 };
 
 export default FormBuilderApp;

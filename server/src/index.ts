@@ -5,6 +5,7 @@ import { config as loadEnv } from "dotenv";
 import chatRoutes from "./routes/chat";
 import handbookRoutes from "./routes/handbook";
 import logsRoutes from "./routes/logs";
+import tenantsRoutes from "./routes/tenants";
 
 if (process.env.NODE_ENV !== "production") {
   // Resolve .env from this package, not process.cwd() (reliable in npm workspaces)
@@ -35,6 +36,7 @@ if (process.env.NODE_ENV !== "production") {
 app.use("/api/chat", chatRoutes);
 app.use("/api/handbook", handbookRoutes);
 app.use("/api/logs", logsRoutes);
+app.use("/api/tenants", tenantsRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });

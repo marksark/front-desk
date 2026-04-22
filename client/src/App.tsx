@@ -5,14 +5,11 @@ import { ChatPage } from "./pages/ChatPage";
 import { FormBuilderPage } from "./pages/FormBuilderPage";
 import LandingPage from "./pages/LandingPage";
 import { OperatorPage } from "./pages/OperatorPage";
+import { useTenant, useTenants } from "./tenant/TenantContext";
 
-const TENANT_ID = "sunshine-academy";
 const API_BASE_URL = '';
 const CHAT_ENDPOINT = `${API_BASE_URL}/api/chat`;
-const HANDBOOK_STATUS_ENDPOINT = `${API_BASE_URL}/api/handbook/${TENANT_ID}/status`;
 const HANDBOOK_UPLOAD_ENDPOINT = `${API_BASE_URL}/api/handbook/upload`;
-const HANDBOOK_DELETE_ENDPOINT = `${API_BASE_URL}/api/handbook/${TENANT_ID}`;
-const LOGS_ENDPOINT = `${API_BASE_URL}/api/logs/${TENANT_ID}`;
 const STARTER_QUESTIONS = [
   "What are your hours?",
   "What's the sick child policy?",
@@ -69,6 +66,19 @@ function truncateAnswer(answer: string): string {
 }
 
 function App() {
+  const { tenantId, setTenant } = useTenant();
+  const { tenants, isLoading: isTenantsLoading, error: tenantsError, addTenant } = useTenants();
+
+  const HANDBOOK_STATUS_ENDPOINT = useMemo(
+    () => `${API_BASE_URL}/api/handbook/${tenantId}/status`,
+    [tenantId]
+  );
+  const HANDBOOK_DELETE_ENDPOINT = useMemo(
+    () => `${API_BASE_URL}/api/handbook/${tenantId}`,
+    [tenantId]
+  );
+  const LOGS_ENDPOINT = useMemo(() => `${API_BASE_URL}/api/logs/${tenantId}`, [tenantId]);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -134,7 +144,7 @@ function App() {
     } finally {
       setIsHandbookLoading(false);
     }
-  }, []);
+  }, [HANDBOOK_STATUS_ENDPOINT]);
 
   const loadLogs = useCallback(async () => {
     setIsLogsLoading(true);
@@ -156,7 +166,7 @@ function App() {
     } finally {
       setIsLogsLoading(false);
     }
-  }, []);
+  }, [LOGS_ENDPOINT]);
 
   useEffect(() => {
     if (!isOperatorRoute) {
@@ -170,7 +180,7 @@ function App() {
   const uploadHandbookFile = async (file: File): Promise<HandbookUploadResponse> => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("tenantId", TENANT_ID);
+    formData.append("tenantId", tenantId);
 
     const uploadResponse = await fetch(HANDBOOK_UPLOAD_ENDPOINT, {
       method: "POST",
@@ -271,7 +281,7 @@ function App() {
       if (uploadInputRef.current) {
         uploadInputRef.current.value = "";
       }
-      setHandbookStatus({ exists: false, tenantId: TENANT_ID });
+      setHandbookStatus({ exists: false, tenantId });
       setHandbookNotice("Handbook removed.");
       await loadHandbookStatus();
     } catch (error) {
@@ -306,7 +316,7 @@ function App() {
         },
         body: JSON.stringify({
           question,
-          tenantId: TENANT_ID
+          tenantId
         })
       });
 
@@ -355,7 +365,12 @@ function App() {
   if (isOperatorRoute) {
     return (
       <OperatorPage
-        tenantId={TENANT_ID}
+        tenantId={tenantId}
+        tenants={tenants}
+        isTenantsLoading={isTenantsLoading}
+        tenantsError={tenantsError}
+        onTenantChange={setTenant}
+        onAddTenant={addTenant}
         activeTab={activeTab}
         handbookStatus={handbookStatus}
         selectedHandbookFile={selectedHandbookFile}

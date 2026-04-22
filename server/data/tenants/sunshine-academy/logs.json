@@ -4,10 +4,18 @@
     {
       "id": "225ae75a-593b-40e2-9390-7fff717596d1",
       "tenantId": "sunshine-academy",
-      "question": "test",
+      "question": "What happens if my child is sick with a specific symptom that I cannot identify?",
       "answer": "I'm not sure about that — please contact the front desk directly for the most accurate information.",
       "timestamp": "2026-03-13T16:33:20.782Z",
       "wasUncertain": true
+    },
+    {
+      "id": "82dcdaf6-a7f7-482b-946c-a25129987002",
+      "tenantId": "sunshine-academy",
+      "question": "What are your hours?",
+      "answer": "Our hours vary by program:\n\n- **Early Head Start (Ages 0-3):** \n  - Child Development Center Hours: 8:00 am to 4:30 pm.\n  - CABQ Extended Care: 2:30 pm to 5:30 pm (Sites may vary).\n\n- **Preschool and NM Pre-K (Ages 3-5):**\n  - Child Development Center Hours: 7:00 am to 5:30 pm.\n  - NM Pre-K Program Hours: 8:00 am to 2:30 pm.\n  - CABQ Extended Care for NM Pre-K: Before and after the NM Pre-K day.\n\nPlease let me know if you need more details!",
+      "timestamp": "2026-04-22T19:15:23.833Z",
+      "wasUncertain": false
     }
   ]
 }
