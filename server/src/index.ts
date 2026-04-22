@@ -1,12 +1,14 @@
 import cors from "cors";
 import express from "express";
 import path from "path";
+import { config as loadEnv } from "dotenv";
 import chatRoutes from "./routes/chat";
 import handbookRoutes from "./routes/handbook";
 import logsRoutes from "./routes/logs";
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config()
+if (process.env.NODE_ENV !== "production") {
+  // Resolve .env from this package, not process.cwd() (reliable in npm workspaces)
+  loadEnv({ path: path.join(__dirname, "../.env") });
 }
 
 const app = express();
@@ -22,6 +24,14 @@ app.use(
 );
 
 app.use(express.json());
+
+if (process.env.NODE_ENV !== "production") {
+  app.use((req, _res, next) => {
+    console.log(`[api] ${new Date().toISOString()} ${req.method} ${req.url}`);
+    next();
+  });
+}
+
 app.use("/api/chat", chatRoutes);
 app.use("/api/handbook", handbookRoutes);
 app.use("/api/logs", logsRoutes);

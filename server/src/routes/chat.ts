@@ -88,7 +88,8 @@ router.post("/", async (req, res) => {
 
     const content = response.choices[0]?.message?.content;
     answer = typeof content === "string" ? content : UNCERTAIN_RESPONSE;
-  } catch {
+  } catch (err) {
+    console.error("[chat] OpenAI request failed:", err);
     return res.status(500).json({ error: "Failed to get a response. Please try again." });
   }
 

@@ -1,5 +1,6 @@
 # AI Front Desk
-### Coding Challenge
+
+### Description
 
 A lightweight, mobile-friendly AI front desk prototype for early education centers.
 Parents ask questions in natural language. The AI answers instantly from the school's uploaded handbook — never guessing, never fabricating policy.
