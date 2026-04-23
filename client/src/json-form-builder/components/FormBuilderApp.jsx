@@ -107,16 +107,16 @@ function FormBuilderApp({ formTemplate, tenantId }) {
   return (
     <div className="App">
       <Container
-        sx={{ display: { xs: "block", lg: "none" } }}
+        sx={{ display: { xs: "block", md: "none" } }}
         maxWidth={false}
         disableGutters
       >
         <Alert severity="info">
-          This feature is only available on larger screens.
+          This feature is only available on medium screens and up.
         </Alert>
       </Container>
       <Container
-        sx={{ display: { xs: "none", lg: "block" } }}
+        sx={{ display: { xs: "none", md: "block" } }}
         maxWidth={false}
         disableGutters
       >
