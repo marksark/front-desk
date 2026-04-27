@@ -1,0 +1,27 @@
+{
+  "tenantId": "sunshine-academy",
+  "jsonSchema": {
+    "title": "Sunshine Intake Form",
+    "type": "object",
+    "description": "<p>Intake form for Sunshine Academy</p>",
+    "required": [],
+    "properties": {
+      "childsName": {
+        "type": "string",
+        "title": "Child's Name"
+      }
+    }
+  },
+  "uiSchema": {
+    "ui:order": [
+      "childsName"
+    ],
+    "childsName": {
+      "ui:cardTitle": "Text",
+      "ui:emptyValue": "",
+      "ui:widget": "TextWidget",
+      "isNew": true
+    }
+  },
+  "updatedAt": "2026-04-23T18:51:10.618Z"
+}

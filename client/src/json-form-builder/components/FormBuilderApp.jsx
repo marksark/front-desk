@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { PropTypes } from "prop-types";
+import { toast } from "react-toastify";
 import validator from "@rjsf/validator-ajv8";
 import {
   Alert,
@@ -46,12 +47,11 @@ import {
 } from "../store/slice";
 import "../styles/formBuilder.css";
 
-function FormBuilderApp({ formTemplate, tenantId }) {
-  // tenantId is currently informational; persistence wiring will use it later.
-  void tenantId;
+function FormBuilderApp({ formTemplate, tenantId, hasSavedTemplate }) {
   const [isExpanded, setIsExpanded] = useState(
     formTemplate?.id ? false : "panel1"
   );
+  const [isSaving, setIsSaving] = useState(false);
   const dispatch = useDispatch();
   const container = useRef(null);
 
@@ -82,8 +82,34 @@ function FormBuilderApp({ formTemplate, tenantId }) {
     dispatch(setShowPreview());
   };
 
-  const handleSave = () => {
-    // dispatch(setShowSchemaPreview());
+  const handleCloseSchemaPreview = () => {
+    dispatch(setShowSchemaPreview());
+  };
+
+  const handleSave = async () => {
+    if (isSaving || !tenantId) {
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const method = hasSavedTemplate ? "PATCH" : "POST";
+      const response = await fetch(
+        `/api/form-template/${encodeURIComponent(tenantId)}`,
+        {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jsonSchema, uiSchema }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      window.location.reload();
+    } catch {
+      toast.error("Could not save form template.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const toggleAccordion = (panel) => (event, expanded) => {
@@ -203,7 +229,7 @@ function FormBuilderApp({ formTemplate, tenantId }) {
           fullWidth
           maxWidth="sm"
           open={showSchemaPreview}
-          onClose={handleSave}
+          onClose={handleCloseSchemaPreview}
         >
           <DialogTitle>Form Schemas</DialogTitle>
           <DialogContent>
@@ -246,13 +272,15 @@ function FormBuilderApp({ formTemplate, tenantId }) {
             </Button>
             <Button
               variant="contained"
-              onClick={handleSave}
+              onClick={() => void handleSave()}
               startIcon={<SaveIcon />}
               disabled={
-                Object.keys(jsonSchema.properties).length === 0 || showPreview
+                Object.keys(jsonSchema.properties).length === 0 ||
+                showPreview ||
+                isSaving
               }
             >
-              Save Form Template
+              {isSaving ? "Saving..." : "Save Form Template"}
             </Button>
           </Toolbar>
         </AppBar>
@@ -264,6 +292,11 @@ function FormBuilderApp({ formTemplate, tenantId }) {
 FormBuilderApp.propTypes = {
   formTemplate: PropTypes.any, // TOOD: Define a more specific type
   tenantId: PropTypes.string,
+  hasSavedTemplate: PropTypes.bool,
+};
+
+FormBuilderApp.defaultProps = {
+  hasSavedTemplate: false,
 };
 
 export default FormBuilderApp;

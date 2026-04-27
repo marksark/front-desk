@@ -12,3 +12,10 @@ export interface HandbookStatus {
   tenantId: string;
   charCount?: number;
 }
+
+export interface FormTemplate {
+  tenantId: string;
+  jsonSchema: Record<string, unknown>;
+  uiSchema: Record<string, unknown>;
+  updatedAt: string;
+}
