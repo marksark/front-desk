@@ -10,7 +10,9 @@
     "dev": "concurrently -k -n client,api -c cyan,magenta \"npm run dev -w client\" \"npm run dev -w server\"",
     "dev:client": "npm run dev -w client",
     "dev:api": "npm run dev -w server",
-    "test": "npm test -w server"
+    "test": "npm test -w server",
+    "test:coverage": "npm run test:coverage -w server",
+    "typecheck": "npm run typecheck -w server"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

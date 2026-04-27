@@ -10,7 +10,9 @@
     "start": "node dist/index.js",
     "vercel-build": "cd ../client && npm install && npm run build",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc -p tsconfig.test.json"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -26,6 +28,7 @@
     "@types/multer": "^2.1.0",
     "@types/node": "^24.3.3",
     "@types/supertest": "^6.0.2",
+    "@vitest/coverage-v8": "^3.2.4",
     "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",

@@ -1,8 +1,10 @@
 import { randomUUID } from "crypto";
+import { constants } from "fs";
+import { access } from "fs/promises";
 import request from "supertest";
 import { afterEach, describe, expect, it } from "vitest";
 import app from "../src/index";
-import { cleanupTenant } from "./_helpers";
+import { cleanupTenant, tenantDir } from "./_helpers";
 
 describe("/api/tenants", () => {
   let createdTenantId: string | undefined;
@@ -41,6 +43,30 @@ describe("/api/tenants", () => {
     expect(String(res.body.error)).toMatch(/invalid tenant id/i);
   });
 
+  it.each([
+    ["empty", ""],
+    ["uppercase", "MyTenant"],
+    ["with underscore", "my_tenant"],
+    ["with dot", "my.tenant"],
+    ["with space", "my tenant"],
+    ["leading hyphen", "-tenant"],
+    ["too long (65 chars)", "a".repeat(65)],
+    ["non-string number", 123],
+    ["non-string null", null]
+  ])("POST / returns 400 for invalid tenant id: %s", async (_label, tenantIdValue) => {
+    const res = await request(app)
+      .post("/api/tenants")
+      .send({ tenantId: tenantIdValue })
+      .expect(400);
+    expect(String(res.body.error)).toMatch(/invalid tenant id/i);
+  });
+
+  it("POST / accepts an id at the maximum length (64 chars)", async () => {
+    const tenantId = `test-${randomUUID()}`.slice(0, 64);
+    createdTenantId = tenantId;
+    await request(app).post("/api/tenants").send({ tenantId }).expect(201);
+  });
+
   it("POST / returns 409 when tenant already exists", async () => {
     const tenantId = `test-${randomUUID()}`;
     createdTenantId = tenantId;
@@ -49,5 +75,33 @@ describe("/api/tenants", () => {
     const res = await request(app).post("/api/tenants").send({ tenantId }).expect(409);
     expect(res.body).toHaveProperty("error");
     expect(String(res.body.error)).toMatch(/already exists/i);
+  });
+
+  it("POST / actually creates the tenant directory on disk", async () => {
+    const tenantId = `test-${randomUUID()}`;
+    createdTenantId = tenantId;
+
+    await request(app).post("/api/tenants").send({ tenantId }).expect(201);
+    await expect(access(tenantDir(tenantId), constants.F_OK)).resolves.toBeUndefined();
+  });
+
+  it("POST / returns 403 in hosted demo (VERCEL=1) and does not create the directory", async () => {
+    const tenantId = `test-${randomUUID()}`;
+    process.env.VERCEL = "1";
+
+    const res = await request(app).post("/api/tenants").send({ tenantId }).expect(403);
+    expect(String(res.body.error)).toMatch(/disabled in the hosted demo/i);
+
+    await expect(access(tenantDir(tenantId), constants.F_OK)).rejects.toThrow();
+  });
+
+  it("POST / trims surrounding whitespace from a valid tenant id", async () => {
+    const tenantId = `test-${randomUUID()}`;
+    createdTenantId = tenantId;
+
+    await request(app)
+      .post("/api/tenants")
+      .send({ tenantId: `  ${tenantId}  ` })
+      .expect(201);
   });
 });

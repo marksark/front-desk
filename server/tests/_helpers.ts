@@ -32,8 +32,14 @@ export async function makeTestTenant(): Promise<string> {
 /**
  * Removes the tenant directory. Only accepts IDs matching makeTestTenant() pattern
  * so real fixture tenants (e.g. sunshine-academy) cannot be deleted by mistake.
+ *
+ * Tolerates undefined/empty input so afterEach hooks don't mask the real test
+ * failure when a test crashes before assigning a tenant id.
  */
-export async function cleanupTenant(tenantId: string): Promise<void> {
+export async function cleanupTenant(tenantId: string | undefined): Promise<void> {
+  if (!tenantId) {
+    return;
+  }
   if (!TEST_TENANT_ID_RE.test(tenantId)) {
     throw new Error(`Refusing to cleanup non-test tenant id: ${tenantId}`);
   }

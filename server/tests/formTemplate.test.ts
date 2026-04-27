@@ -85,4 +85,76 @@ describe("/api/form-template", () => {
       .expect(404);
     expect(res.body.error).toMatch(/not found/i);
   });
+
+  it("GET /:tenantId returns the freshly POSTed template (round-trip)", async () => {
+    tenantId = await makeTestTenant();
+    const jsonSchema = { type: "object", properties: { name: { type: "string" } } };
+    const uiSchema = { name: { "ui:widget": "text" } };
+
+    await request(app)
+      .post(`/api/form-template/${tenantId}`)
+      .send({ jsonSchema, uiSchema })
+      .expect(201);
+
+    const res = await request(app).get(`/api/form-template/${tenantId}`).expect(200);
+    expect(res.body.template.tenantId).toBe(tenantId);
+    expect(res.body.template.jsonSchema).toEqual(jsonSchema);
+    expect(res.body.template.uiSchema).toEqual(uiSchema);
+  });
+
+  it("POST /:tenantId returns 400 when uiSchema is null", async () => {
+    tenantId = await makeTestTenant();
+    const res = await request(app)
+      .post(`/api/form-template/${tenantId}`)
+      .send({ jsonSchema: { a: 1 }, uiSchema: null })
+      .expect(400);
+    expect(res.body.error).toMatch(/must be objects/i);
+  });
+
+  it("PATCH /:tenantId returns 400 when uiSchema is an array", async () => {
+    tenantId = await makeTestTenant();
+    await request(app)
+      .post(`/api/form-template/${tenantId}`)
+      .send({ jsonSchema: { a: 1 }, uiSchema: { b: 1 } })
+      .expect(201);
+
+    const res = await request(app)
+      .patch(`/api/form-template/${tenantId}`)
+      .send({ jsonSchema: { a: 1 }, uiSchema: [] })
+      .expect(400);
+    expect(res.body.error).toMatch(/must be objects/i);
+  });
+
+  it("POST /:tenantId returns 403 in hosted demo (VERCEL=1) and does not create the file", async () => {
+    tenantId = await makeTestTenant();
+    process.env.VERCEL = "1";
+
+    const res = await request(app)
+      .post(`/api/form-template/${tenantId}`)
+      .send({ jsonSchema: { a: 1 }, uiSchema: { b: 1 } })
+      .expect(403);
+    expect(res.body.error).toMatch(/disabled in the hosted demo/i);
+
+    delete process.env.VERCEL;
+    await request(app).get(`/api/form-template/${tenantId}`).expect(404);
+  });
+
+  it("PATCH /:tenantId returns 403 in hosted demo (VERCEL=1) and does not update", async () => {
+    tenantId = await makeTestTenant();
+    await request(app)
+      .post(`/api/form-template/${tenantId}`)
+      .send({ jsonSchema: { v: 1 }, uiSchema: {} })
+      .expect(201);
+
+    process.env.VERCEL = "1";
+    const res = await request(app)
+      .patch(`/api/form-template/${tenantId}`)
+      .send({ jsonSchema: { v: 99 }, uiSchema: {} })
+      .expect(403);
+    expect(res.body.error).toMatch(/disabled in the hosted demo/i);
+
+    delete process.env.VERCEL;
+    const after = await request(app).get(`/api/form-template/${tenantId}`).expect(200);
+    expect(after.body.template.jsonSchema).toEqual({ v: 1 });
+  });
 });

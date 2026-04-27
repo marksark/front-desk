@@ -120,4 +120,110 @@ describe("/api/chat", () => {
       .expect(500);
     expect(res.body.error).toMatch(/failed to get a response/i);
   });
+
+  it("POST / returns 400 when question is whitespace-only", async () => {
+    tenantId = await makeTestTenant();
+    await saveHandbook(tenantId, "PROGRAM OVERVIEW\nX.");
+
+    const res = await request(app)
+      .post("/api/chat")
+      .send({ question: "   \n  ", tenantId })
+      .expect(400);
+    expect(res.body.error).toMatch(/invalid request body/i);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it("POST / returns 400 when tenantId is whitespace-only", async () => {
+    tenantId = await makeTestTenant();
+    const res = await request(app)
+      .post("/api/chat")
+      .send({ question: "Hello?", tenantId: "   " })
+      .expect(400);
+    expect(res.body.error).toMatch(/invalid request body/i);
+  });
+
+  it("POST / returns 400 when body is missing entirely", async () => {
+    tenantId = await makeTestTenant();
+    const res = await request(app).post("/api/chat").send({}).expect(400);
+    expect(res.body.error).toMatch(/invalid request body/i);
+  });
+
+  it("POST / falls back to UNCERTAIN_RESPONSE and flags wasUncertain when OpenAI returns no content", async () => {
+    tenantId = await makeTestTenant();
+    await saveHandbook(tenantId, "PROGRAM OVERVIEW\nX.");
+    mockCreate.mockResolvedValue({ choices: [{ message: { content: null } }] });
+
+    const res = await request(app)
+      .post("/api/chat")
+      .send({ question: "Edge case?", tenantId })
+      .expect(200);
+
+    expect(res.body.wasUncertain).toBe(true);
+    expect(res.body.answer).toMatch(/contact the front desk/i);
+  });
+
+  it("POST / falls back gracefully when choices array is empty", async () => {
+    tenantId = await makeTestTenant();
+    await saveHandbook(tenantId, "PROGRAM OVERVIEW\nX.");
+    mockCreate.mockResolvedValue({ choices: [] });
+
+    const res = await request(app)
+      .post("/api/chat")
+      .send({ question: "Edge case?", tenantId })
+      .expect(200);
+
+    expect(res.body.wasUncertain).toBe(true);
+  });
+
+  it("POST / detects 'not sure' phrasing without 'contact the front desk'", async () => {
+    tenantId = await makeTestTenant();
+    await saveHandbook(tenantId, "PROGRAM OVERVIEW\nX.");
+    mockCreate.mockResolvedValue({
+      choices: [{ message: { content: "I'm not sure based on the handbook." } }]
+    });
+
+    const res = await request(app)
+      .post("/api/chat")
+      .send({ question: "Q?", tenantId })
+      .expect(200);
+
+    expect(res.body.wasUncertain).toBe(true);
+  });
+
+  it("POST / treats certainty detection case-insensitively", async () => {
+    tenantId = await makeTestTenant();
+    await saveHandbook(tenantId, "PROGRAM OVERVIEW\nX.");
+    mockCreate.mockResolvedValue({
+      choices: [{ message: { content: "Please CONTACT THE FRONT DESK for details." } }]
+    });
+
+    const res = await request(app)
+      .post("/api/chat")
+      .send({ question: "Q?", tenantId })
+      .expect(200);
+
+    expect(res.body.wasUncertain).toBe(true);
+  });
+
+  it("POST / trims question before logging and forwarding to OpenAI", async () => {
+    tenantId = await makeTestTenant();
+    await saveHandbook(tenantId, "PROGRAM OVERVIEW\nX.");
+    mockCreate.mockResolvedValue({
+      choices: [{ message: { content: "Open at 9am." } }]
+    });
+
+    await request(app)
+      .post("/api/chat")
+      .send({ question: "   What are your hours?\n", tenantId })
+      .expect(200);
+
+    const userMessage = mockCreate.mock.calls[0][0].messages.find(
+      (m: { role: string }) => m.role === "user"
+    );
+    expect(userMessage.content).toBe("What are your hours?");
+
+    const filePath = path.join(tenantDir(tenantId), "logs.json");
+    const onDisk = await readJson<TenantLogsFile>(filePath);
+    expect(onDisk.logs[0].question).toBe("What are your hours?");
+  });
 });

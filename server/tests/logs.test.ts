@@ -1,3 +1,4 @@
+import { writeFile } from "fs/promises";
 import path from "path";
 import request from "supertest";
 import { afterEach, describe, expect, it } from "vitest";
@@ -66,5 +67,48 @@ describe("/api/logs", () => {
 
     const res = await request(app).get(`/api/logs/${tenantId}`).expect(200);
     expect(res.body.logs.map((l: LogEntry) => l.id)).toEqual(["1", "2"]);
+  });
+
+  it("GET /:tenantId returns empty logs when file is corrupted", async () => {
+    tenantId = await makeTestTenant();
+    const filePath = path.join(tenantDir(tenantId), "logs.json");
+    await writeFile(filePath, "{ this is not valid json", "utf-8");
+
+    const res = await request(app).get(`/api/logs/${tenantId}`).expect(200);
+    expect(res.body).toEqual({ tenantId, logs: [] });
+  });
+
+  it("POST /:tenantId rejects when wasUncertain is not a boolean", async () => {
+    tenantId = await makeTestTenant();
+    const res = await request(app)
+      .post(`/api/logs/${tenantId}`)
+      .send({
+        id: "log-1",
+        question: "q",
+        answer: "a",
+        timestamp: "2025-01-01T00:00:00.000Z",
+        wasUncertain: "no"
+      })
+      .expect(400);
+    expect(res.body.error).toMatch(/invalid log entry/i);
+  });
+
+  it("POST /:tenantId is a no-op on disk when VERCEL=1", async () => {
+    tenantId = await makeTestTenant();
+    process.env.VERCEL = "1";
+
+    const entry = {
+      id: "vercel-1",
+      question: "Q",
+      answer: "A",
+      timestamp: new Date().toISOString(),
+      wasUncertain: false
+    };
+
+    // Route still returns 201 (the response is constructed before the write).
+    await request(app).post(`/api/logs/${tenantId}`).send(entry).expect(201);
+
+    const res = await request(app).get(`/api/logs/${tenantId}`).expect(200);
+    expect(res.body.logs).toEqual([]);
   });
 });

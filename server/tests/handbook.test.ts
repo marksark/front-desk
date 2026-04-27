@@ -117,4 +117,82 @@ describe("/api/handbook", () => {
 
     await request(app).delete(`/api/handbook/${tenantId}`).expect(200);
   });
+
+  it("POST /upload rejects legacy .doc files by extension", async () => {
+    tenantId = await makeTestTenant();
+
+    const res = await request(app)
+      .post("/api/handbook/upload")
+      .field("tenantId", tenantId)
+      .attach("file", Buffer.from("fake doc"), {
+        filename: "handbook.doc",
+        contentType: "application/octet-stream"
+      })
+      .expect(400);
+
+    expect(res.body.error).toMatch(/word documents are not supported/i);
+  });
+
+  it("POST /upload rejects unsupported MIME types (e.g. images)", async () => {
+    tenantId = await makeTestTenant();
+
+    const res = await request(app)
+      .post("/api/handbook/upload")
+      .field("tenantId", tenantId)
+      .attach("file", Buffer.from([0xff, 0xd8, 0xff]), {
+        filename: "photo.jpg",
+        contentType: "image/jpeg"
+      })
+      .expect(400);
+
+    expect(res.body.error).toMatch(/unsupported file type/i);
+    expect(await getHandbookText(tenantId)).toBeNull();
+  });
+
+  it("POST /upload returns 400 when tenantId is missing", async () => {
+    tenantId = await makeTestTenant();
+
+    const res = await request(app)
+      .post("/api/handbook/upload")
+      .attach("file", Buffer.from("PROGRAM OVERVIEW\nNo tenant.", "utf-8"), {
+        filename: "h.txt",
+        contentType: "text/plain"
+      })
+      .expect(400);
+
+    expect(res.body.error).toMatch(/both tenantid and file are required/i);
+  });
+
+  it("POST /upload propagates a 500 when pdf-parse throws", async () => {
+    tenantId = await makeTestTenant();
+    mockGetText.mockRejectedValue(new Error("corrupt PDF"));
+
+    await request(app)
+      .post("/api/handbook/upload")
+      .field("tenantId", tenantId)
+      .attach("file", Buffer.from("%PDF-1.4 broken"), {
+        filename: "h.pdf",
+        contentType: "application/pdf"
+      })
+      .expect(500);
+
+    expect(await getHandbookText(tenantId)).toBeNull();
+  });
+
+  it("GET /:tenantId/status returns charCount equal to stored handbook length", async () => {
+    tenantId = await makeTestTenant();
+    await request(app)
+      .post("/api/handbook/upload")
+      .field("tenantId", tenantId)
+      .attach("file", Buffer.from("PROGRAM OVERVIEW\nABCDE.", "utf-8"), {
+        filename: "h.txt",
+        contentType: "text/plain"
+      })
+      .expect(200);
+
+    const stored = await getHandbookText(tenantId);
+    const res = await request(app).get(`/api/handbook/${tenantId}/status`).expect(200);
+    expect(res.body.exists).toBe(true);
+    expect(res.body.charCount).toBe(stored!.length);
+  });
 });
