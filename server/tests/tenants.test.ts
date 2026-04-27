@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { constants } from "fs";
-import { access } from "fs/promises";
+import { access, rm } from "fs/promises";
 import request from "supertest";
 import { afterEach, describe, expect, it } from "vitest";
 import app from "../src/index";
@@ -62,9 +62,13 @@ describe("/api/tenants", () => {
   });
 
   it("POST / accepts an id at the maximum length (64 chars)", async () => {
-    const tenantId = `test-${randomUUID()}`.slice(0, 64);
-    createdTenantId = tenantId;
-    await request(app).post("/api/tenants").send({ tenantId }).expect(201);
+    const base = `test-${randomUUID()}`;
+    const tenantId = `${base}${"a".repeat(64 - base.length)}`;
+    try {
+      await request(app).post("/api/tenants").send({ tenantId }).expect(201);
+    } finally {
+      await rm(tenantDir(tenantId), { recursive: true, force: true });
+    }
   });
 
   it("POST / returns 409 when tenant already exists", async () => {
