@@ -1,7 +1,7 @@
 import { ChangeEvent, ChangeEventHandler, FormEvent, RefObject, useState } from "react";
 import type { Tenant } from "../tenant/TenantContext";
 
-type OperatorTab = "handbook" | "questionLog";
+type OperatorTab = "handbook" | "questionLog" | "formSubmissions";
 
 interface HandbookStatus {
   exists: boolean;
@@ -14,6 +14,12 @@ interface LogEntry {
   answer: string;
   timestamp: string;
   wasUncertain: boolean;
+}
+
+interface FormSubmission {
+  id: string;
+  formData: Record<string, unknown>;
+  submittedAt: string;
 }
 
 interface PersistentNavTarget {
@@ -39,6 +45,9 @@ interface OperatorPageProps {
   logs: LogEntry[];
   logsError: string | null;
   isLogsLoading: boolean;
+  formSubmissions: FormSubmission[];
+  formSubmissionsError: string | null;
+  isFormSubmissionsLoading: boolean;
   uploadInputRef: RefObject<HTMLInputElement | null>;
   replaceInputRef: RefObject<HTMLInputElement | null>;
   persistentNavTarget: PersistentNavTarget;
@@ -68,6 +77,9 @@ export function OperatorPage({
   logs,
   logsError,
   isLogsLoading,
+  formSubmissions,
+  formSubmissionsError,
+  isFormSubmissionsLoading,
   uploadInputRef,
   replaceInputRef,
   persistentNavTarget,
@@ -153,6 +165,12 @@ export function OperatorPage({
             <p>
               <a href="/admin/form-builder">Open Intake Form Builder</a>
             </p>
+            <p>
+              <a href={`/intake?tenant=${encodeURIComponent(tenantId)}`}>
+                Public intake form link
+              </a>{" "}
+              (share with families)
+            </p>
           </header>
 
           <div className="operator-tabs" role="tablist" aria-label="Operator tabs">
@@ -173,6 +191,15 @@ export function OperatorPage({
               onClick={() => onSetActiveTab("questionLog")}
             >
               Question Log
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "formSubmissions"}
+              className={`operator-tab ${activeTab === "formSubmissions" ? "active" : ""}`}
+              onClick={() => onSetActiveTab("formSubmissions")}
+            >
+              Form submissions
             </button>
           </div>
 
@@ -263,6 +290,44 @@ export function OperatorPage({
                             <td>{log.question}</td>
                             <td>{truncateAnswer(log.answer)}</td>
                             <td>{log.wasUncertain ? "⚠️ Uncertain" : "✅ Answered"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {activeTab === "formSubmissions" ? (
+              <div className="operator-section">
+                <h2>Form submissions</h2>
+                {isFormSubmissionsLoading ? <p>Loading submissions...</p> : null}
+                {formSubmissionsError ? (
+                  <p className="operator-error">{formSubmissionsError}</p>
+                ) : null}
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length === 0 ? (
+                  <p>No form responses yet. Share the public link above with families.</p>
+                ) : null}
+
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length > 0 ? (
+                  <div className="logs-table-wrap">
+                    <table className="logs-table">
+                      <thead>
+                        <tr>
+                          <th>Time</th>
+                          <th>Data</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formSubmissions.map((row) => (
+                          <tr key={row.id}>
+                            <td>{new Date(row.submittedAt).toLocaleString()}</td>
+                            <td>
+                              <pre className="form-submission-json">
+                                {JSON.stringify(row.formData, null, 2)}
+                              </pre>
+                            </td>
                           </tr>
                         ))}
                       </tbody>

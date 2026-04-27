@@ -3,6 +3,7 @@ import "./App.css";
 import { FormBuilderProviders } from "./form-builder/FormBuilderProviders";
 import { ChatPage } from "./pages/ChatPage";
 import { FormBuilderPage } from "./pages/FormBuilderPage";
+import { FormIntakePage } from "./pages/FormIntakePage";
 import LandingPage from "./pages/LandingPage";
 import { OperatorPage } from "./pages/OperatorPage";
 import { useTenant, useTenants } from "./tenant/TenantContext";
@@ -42,13 +43,20 @@ interface LogEntry {
   wasUncertain: boolean;
 }
 
+interface FormSubmission {
+  id: string;
+  tenantId: string;
+  formData: Record<string, unknown>;
+  submittedAt: string;
+}
+
 interface LogsApiResponse {
   tenantId: string;
   logs: LogEntry[];
 }
 
 type MessageRole = "user" | "assistant";
-type OperatorTab = "handbook" | "questionLog";
+type OperatorTab = "handbook" | "questionLog" | "formSubmissions";
 
 interface Message {
   id: string;
@@ -78,6 +86,10 @@ function App() {
     [tenantId]
   );
   const LOGS_ENDPOINT = useMemo(() => `${API_BASE_URL}/api/logs/${tenantId}`, [tenantId]);
+  const FORM_SUBMISSIONS_ENDPOINT = useMemo(
+    () => `${API_BASE_URL}/api/form-submissions/${tenantId}`,
+    [tenantId]
+  );
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
@@ -99,16 +111,27 @@ function App() {
   const [logsError, setLogsError] = useState<string | null>(null);
   const [isLogsLoading, setIsLogsLoading] = useState(false);
 
+  const [formSubmissions, setFormSubmissions] = useState<FormSubmission[]>([]);
+  const [formSubmissionsError, setFormSubmissionsError] = useState<string | null>(null);
+  const [isFormSubmissionsLoading, setIsFormSubmissionsLoading] = useState(false);
+
   const routePath = useMemo(() => window.location.pathname, []);
   const isLandingRoute = routePath === "/";
   const isChatRoute = routePath === "/chat";
   const isOperatorRoute = routePath === "/operator";
   const isFormBuilderRoute = routePath === "/admin/form-builder";
+  const isFormIntakeRoute = routePath === "/intake";
+  const formIntakeTenant = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("tenant")?.trim() ?? null;
+  }, [routePath]);
   const persistentNavTarget = isFormBuilderRoute
     ? { href: "/operator", label: "Back to Operator Dashboard" }
     : isOperatorRoute
       ? { href: "/chat", label: "Go to Parent Chat" }
-      : { href: "/operator", label: "Go to Operator Dashboard" };
+      : isFormIntakeRoute
+        ? { href: "/operator", label: "Back to staff" }
+        : { href: "/operator", label: "Go to Operator Dashboard" };
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -146,6 +169,33 @@ function App() {
     }
   }, [HANDBOOK_STATUS_ENDPOINT]);
 
+  const loadFormSubmissions = useCallback(async () => {
+    setIsFormSubmissionsLoading(true);
+    setFormSubmissionsError(null);
+
+    try {
+      const response = await fetch(FORM_SUBMISSIONS_ENDPOINT);
+      if (response.status === 404) {
+        setFormSubmissions([]);
+        return;
+      }
+      if (!response.ok) {
+        throw new Error("Unable to load form submissions.");
+      }
+      const payload = (await response.json()) as { submissions: FormSubmission[] };
+      const list = Array.isArray(payload.submissions) ? payload.submissions : [];
+      setFormSubmissions(
+        [...list].sort(
+          (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+        )
+      );
+    } catch {
+      setFormSubmissionsError("Could not load form submissions.");
+    } finally {
+      setIsFormSubmissionsLoading(false);
+    }
+  }, [FORM_SUBMISSIONS_ENDPOINT]);
+
   const loadLogs = useCallback(async () => {
     setIsLogsLoading(true);
     setLogsError(null);
@@ -175,7 +225,8 @@ function App() {
 
     void loadHandbookStatus();
     void loadLogs();
-  }, [isOperatorRoute, loadHandbookStatus, loadLogs]);
+    void loadFormSubmissions();
+  }, [isOperatorRoute, loadHandbookStatus, loadLogs, loadFormSubmissions]);
 
   const uploadHandbookFile = async (file: File): Promise<HandbookUploadResponse> => {
     const formData = new FormData();
@@ -351,6 +402,27 @@ function App() {
     await sendQuestion(draft);
   };
 
+  if (isFormIntakeRoute) {
+    if (!formIntakeTenant) {
+      return (
+        <div className="route-fallback">
+          <p>Choose a school to open the intake form.</p>
+          <p>
+            Example: add <code>?tenant=sunshine-academy</code> to the URL.
+          </p>
+        </div>
+      );
+    }
+    return (
+      <>
+        <FormIntakePage tenantId={formIntakeTenant} title="Intake form" />
+        <a className="persistent-nav-button" href={persistentNavTarget.href}>
+          {persistentNavTarget.label}
+        </a>
+      </>
+    );
+  }
+
   if (isFormBuilderRoute) {
     return (
       <FormBuilderProviders>
@@ -382,6 +454,9 @@ function App() {
         logs={logs}
         logsError={logsError}
         isLogsLoading={isLogsLoading}
+        formSubmissions={formSubmissions}
+        formSubmissionsError={formSubmissionsError}
+        isFormSubmissionsLoading={isFormSubmissionsLoading}
         uploadInputRef={uploadInputRef}
         replaceInputRef={replaceInputRef}
         persistentNavTarget={persistentNavTarget}
@@ -402,10 +477,11 @@ function App() {
   if (!isChatRoute) {
     return (
       <div className="route-fallback">
-        <p>This app has screens at /chat, /operator, and /admin/form-builder.</p>
+        <p>This app has screens at /chat, /operator, /intake, and /admin/form-builder.</p>
         <div className="route-links">
           <a href="/chat">Go to parent chat</a>
           <a href="/operator">Go to operator dashboard</a>
+          <a href="/intake?tenant=sunshine-academy">Go to intake form (example tenant)</a>
           <a href="/admin/form-builder">Go to intake form builder</a>
         </div>
       </div>

@@ -52,6 +52,7 @@ function FormBuilderApp({ formTemplate, tenantId, hasSavedTemplate }) {
     formTemplate?.id ? false : "panel1"
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [isPreviewSubmitting, setIsPreviewSubmitting] = useState(false);
   const dispatch = useDispatch();
   const container = useRef(null);
 
@@ -84,6 +85,51 @@ function FormBuilderApp({ formTemplate, tenantId, hasSavedTemplate }) {
 
   const handleCloseSchemaPreview = () => {
     dispatch(setShowSchemaPreview());
+  };
+
+  const previewUiSchema = {
+    ...uiSchema,
+    "ui:submitButtonOptions": {
+      submitText: isPreviewSubmitting ? "Submitting…" : "Send test response",
+    },
+  };
+
+  const handlePreviewSubmit = async ({ formData }) => {
+    if (isPreviewSubmitting || !tenantId) {
+      return;
+    }
+    setIsPreviewSubmitting(true);
+    try {
+      const response = await fetch(
+        `/api/form-submissions/${encodeURIComponent(tenantId)}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ formData: formData ?? {} }),
+        }
+      );
+      if (!response.ok) {
+        let message = "Could not record test submission.";
+        if (response.status === 403) {
+          message =
+            "Form submission is not available in the hosted demo. Run the app locally to test.";
+        }
+        try {
+          const data = await response.json();
+          if (data && typeof data.error === "string") {
+            message = data.error;
+          }
+        } catch {
+          // keep default
+        }
+        throw new Error(message);
+      }
+      toast.success("Test response recorded. Check Form submissions on the operator dashboard.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not record test submission.");
+    } finally {
+      setIsPreviewSubmitting(false);
+    }
   };
 
   const handleSave = async () => {
@@ -219,9 +265,11 @@ function FormBuilderApp({ formTemplate, tenantId, hasSavedTemplate }) {
           <DialogContent>
             <FormWithWidgets
               schema={jsonSchema}
-              uiSchema={uiSchema}
+              uiSchema={previewUiSchema}
               validator={validator}
               liveValidate
+              readonly={isPreviewSubmitting}
+              onSubmit={handlePreviewSubmit}
             />
           </DialogContent>
         </Dialog>
