@@ -121,9 +121,7 @@ function App() {
   const isChatRoute = routePath === "/chat";
   const isOperatorRoute = routePath === "/operator";
   const isFormBuilderRoute = routePath === "/admin/form-builder";
-  const persistentNavTarget = isChatRoute
-    ? { href: "/operator", label: "Operator Dashboard" }
-    : { href: "/chat", label: "Parent Chat" };
+  const persistentNavTarget = { href: "/operator", label: "Operator Dashboard" };
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
