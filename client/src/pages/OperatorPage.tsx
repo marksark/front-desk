@@ -16,11 +16,6 @@ interface LogEntry {
   wasUncertain: boolean;
 }
 
-interface PersistentNavTarget {
-  href: string;
-  label: string;
-}
-
 interface OperatorPageProps {
   tenantId: string;
   tenants: Tenant[];
@@ -41,7 +36,6 @@ interface OperatorPageProps {
   isLogsLoading: boolean;
   uploadInputRef: RefObject<HTMLInputElement | null>;
   replaceInputRef: RefObject<HTMLInputElement | null>;
-  persistentNavTarget: PersistentNavTarget;
   truncateAnswer: (answer: string) => string;
   onSetActiveTab: (tab: OperatorTab) => void;
   onUploadFileChange: ChangeEventHandler<HTMLInputElement>;
@@ -70,7 +64,6 @@ export function OperatorPage({
   isLogsLoading,
   uploadInputRef,
   replaceInputRef,
-  persistentNavTarget,
   truncateAnswer,
   onSetActiveTab,
   onUploadFileChange,
@@ -114,7 +107,41 @@ export function OperatorPage({
       <main className="operator-page">
         <section className="operator-shell">
           <header className="operator-header">
-            <h1>Operator Dashboard</h1>
+            <div className="operator-title-row">
+              <div>
+                <p className="operator-eyebrow">Staff workspace</p>
+                <h1>Operator Dashboard</h1>
+                <p className="operator-subtitle">
+                  Manage handbooks, review parent questions, and move between workspaces.
+                </p>
+              </div>
+            </div>
+
+            <nav className="operator-main-nav" aria-label="Operator workspace navigation">
+              <a className="operator-main-nav-link" href="/chat">
+                Parent Chat
+              </a>
+              <button
+                type="button"
+                className={`operator-main-nav-link ${activeTab === "handbook" ? "active" : ""}`}
+                aria-current={activeTab === "handbook" ? "page" : undefined}
+                onClick={() => onSetActiveTab("handbook")}
+              >
+                Handbook
+              </button>
+              <button
+                type="button"
+                className={`operator-main-nav-link ${activeTab === "questionLog" ? "active" : ""}`}
+                aria-current={activeTab === "questionLog" ? "page" : undefined}
+                onClick={() => onSetActiveTab("questionLog")}
+              >
+                Question Log
+              </button>
+              <a className="operator-main-nav-link" href="/admin/form-builder">
+                Form Builder
+              </a>
+            </nav>
+
             <div className="operator-tenant-controls">
               <label className="operator-tenant-label">
                 <span>Tenant:</span>
@@ -150,31 +177,7 @@ export function OperatorPage({
             </div>
             {tenantsError ? <p className="operator-error">{tenantsError}</p> : null}
             {addTenantError ? <p className="operator-error">{addTenantError}</p> : null}
-            <p>
-              <a href="/admin/form-builder">Open Intake Form Builder</a>
-            </p>
           </header>
-
-          <div className="operator-tabs" role="tablist" aria-label="Operator tabs">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === "handbook"}
-              className={`operator-tab ${activeTab === "handbook" ? "active" : ""}`}
-              onClick={() => onSetActiveTab("handbook")}
-            >
-              Handbook
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === "questionLog"}
-              className={`operator-tab ${activeTab === "questionLog" ? "active" : ""}`}
-              onClick={() => onSetActiveTab("questionLog")}
-            >
-              Question Log
-            </button>
-          </div>
 
           <section className="operator-panel">
             {activeTab === "handbook" ? (
@@ -273,10 +276,7 @@ export function OperatorPage({
             ) : null}
           </section>
         </section>
-      </main >
-      <a className="persistent-nav-button" href={persistentNavTarget.href}>
-        {persistentNavTarget.label}
-      </a>
+      </main>
     </>
   );
 }
