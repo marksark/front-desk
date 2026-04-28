@@ -134,6 +134,17 @@ function App() {
         : { href: "/operator", label: "Go to Operator Dashboard" };
 
   useEffect(() => {
+    if (!isOperatorRoute) {
+      return;
+    }
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab === "handbook" || tab === "questionLog" || tab === "formSubmissions") {
+      setActiveTab(tab);
+    }
+  }, [isOperatorRoute]);
+
+  useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isLoading]);
 
