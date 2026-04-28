@@ -52,6 +52,7 @@ function FormBuilderApp({ formTemplate, tenantId, hasSavedTemplate }) {
     formTemplate?.id ? false : "panel1"
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [isTestSubmitting, setIsTestSubmitting] = useState(false);
   const dispatch = useDispatch();
   const container = useRef(null);
 
@@ -84,6 +85,43 @@ function FormBuilderApp({ formTemplate, tenantId, hasSavedTemplate }) {
 
   const handleCloseSchemaPreview = () => {
     dispatch(setShowSchemaPreview());
+  };
+
+  const handleTestSubmit = async ({ formData }) => {
+    if (!tenantId || isTestSubmitting) {
+      return;
+    }
+    setIsTestSubmitting(true);
+    try {
+      const response = await fetch(
+        `/api/form-submissions/${encodeURIComponent(tenantId)}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ formData: formData ?? {} }),
+        }
+      );
+      const payload = await response.json().catch(() => ({}));
+      if (response.status === 403) {
+        toast.error(
+          "Test submit is disabled on the hosted demo. Run locally to try this."
+        );
+        return;
+      }
+      if (!response.ok) {
+        const msg =
+          typeof payload.error === "string" && payload.error.trim().length > 0
+            ? payload.error
+            : "Could not submit test response.";
+        toast.error(msg);
+        return;
+      }
+      toast.success("Test response recorded.");
+    } catch {
+      toast.error("Could not submit test response.");
+    } finally {
+      setIsTestSubmitting(false);
+    }
   };
 
   const handleSave = async () => {
@@ -222,7 +260,19 @@ function FormBuilderApp({ formTemplate, tenantId, hasSavedTemplate }) {
               uiSchema={uiSchema}
               validator={validator}
               liveValidate
-            />
+              onSubmit={handleTestSubmit}
+            >
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                disabled={isTestSubmitting}
+                sx={{ mt: 2 }}
+              >
+                {isTestSubmitting ? "Sending…" : "Send test response"}
+              </Button>
+            </FormWithWidgets>
           </DialogContent>
         </Dialog>
         <Dialog

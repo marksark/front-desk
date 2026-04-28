@@ -1,7 +1,14 @@
 import { ChangeEvent, ChangeEventHandler, FormEvent, RefObject, useState } from "react";
 import type { Tenant } from "../tenant/TenantContext";
 
-type OperatorTab = "handbook" | "questionLog";
+type OperatorTab = "handbook" | "questionLog" | "formSubmissions";
+
+interface FormSubmissionRow {
+  id: string;
+  tenantId: string;
+  submittedAt: string;
+  formData: Record<string, unknown>;
+}
 
 interface HandbookStatus {
   exists: boolean;
@@ -39,6 +46,10 @@ interface OperatorPageProps {
   logs: LogEntry[];
   logsError: string | null;
   isLogsLoading: boolean;
+  formSubmissions: FormSubmissionRow[];
+  formSubmissionsError: string | null;
+  isFormSubmissionsLoading: boolean;
+  intakeFormUrl: string;
   uploadInputRef: RefObject<HTMLInputElement | null>;
   replaceInputRef: RefObject<HTMLInputElement | null>;
   persistentNavTarget: PersistentNavTarget;
@@ -68,6 +79,10 @@ export function OperatorPage({
   logs,
   logsError,
   isLogsLoading,
+  formSubmissions,
+  formSubmissionsError,
+  isFormSubmissionsLoading,
+  intakeFormUrl,
   uploadInputRef,
   replaceInputRef,
   persistentNavTarget,
@@ -153,6 +168,12 @@ export function OperatorPage({
             <p>
               <a href="/admin/form-builder">Open Intake Form Builder</a>
             </p>
+            <p className="operator-intake-link">
+              <span>Public form link: </span>
+              <a href={intakeFormUrl} target="_blank" rel="noreferrer">
+                {intakeFormUrl}
+              </a>
+            </p>
           </header>
 
           <div className="operator-tabs" role="tablist" aria-label="Operator tabs">
@@ -173,6 +194,15 @@ export function OperatorPage({
               onClick={() => onSetActiveTab("questionLog")}
             >
               Question Log
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "formSubmissions"}
+              className={`operator-tab ${activeTab === "formSubmissions" ? "active" : ""}`}
+              onClick={() => onSetActiveTab("formSubmissions")}
+            >
+              Form submissions
             </button>
           </div>
 
@@ -263,6 +293,50 @@ export function OperatorPage({
                             <td>{log.question}</td>
                             <td>{truncateAnswer(log.answer)}</td>
                             <td>{log.wasUncertain ? "⚠️ Uncertain" : "✅ Answered"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {activeTab === "formSubmissions" ? (
+              <div className="operator-section">
+                <h2>Form submissions</h2>
+                <p>
+                  Share the public form:{" "}
+                  <a href={intakeFormUrl} target="_blank" rel="noreferrer">
+                    {intakeFormUrl}
+                  </a>
+                </p>
+                {isFormSubmissionsLoading ? <p>Loading submissions...</p> : null}
+                {formSubmissionsError ? <p className="operator-error">{formSubmissionsError}</p> : null}
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length === 0 ? (
+                  <p>No form responses yet.</p>
+                ) : null}
+
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length > 0 ? (
+                  <div className="logs-table-wrap form-submissions-table-wrap">
+                    <table className="logs-table form-submissions-table">
+                      <thead>
+                        <tr>
+                          <th>Time</th>
+                          <th>Response (JSON)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formSubmissions.map((row) => (
+                          <tr key={row.id}>
+                            <td className="form-submission-time">
+                              {new Date(row.submittedAt).toLocaleString()}
+                            </td>
+                            <td>
+                              <pre className="form-submission-json">
+                                {JSON.stringify(row.formData, null, 2)}
+                              </pre>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
