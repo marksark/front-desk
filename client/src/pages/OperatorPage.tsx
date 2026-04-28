@@ -1,7 +1,7 @@
 import { ChangeEvent, ChangeEventHandler, FormEvent, RefObject, useState } from "react";
 import type { Tenant } from "../tenant/TenantContext";
 
-type OperatorTab = "handbook" | "questionLog";
+type OperatorTab = "handbook" | "questionLog" | "intakeSubmissions";
 
 interface HandbookStatus {
   exists: boolean;
@@ -14,6 +14,14 @@ interface LogEntry {
   answer: string;
   timestamp: string;
   wasUncertain: boolean;
+}
+
+interface FormSubmissionEntry {
+  id: string;
+  formData: Record<string, unknown>;
+  submittedAt: string;
+  submitterName?: string;
+  submitterEmail?: string;
 }
 
 interface PersistentNavTarget {
@@ -48,6 +56,9 @@ interface OperatorPageProps {
   onHandbookUpload: () => Promise<void>;
   onReplaceSelection: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   onRemoveHandbook: () => Promise<void>;
+  formSubmissions: FormSubmissionEntry[];
+  formSubmissionsError: string | null;
+  isFormSubmissionsLoading: boolean;
 }
 
 export function OperatorPage({
@@ -76,7 +87,10 @@ export function OperatorPage({
   onUploadFileChange,
   onHandbookUpload,
   onReplaceSelection,
-  onRemoveHandbook
+  onRemoveHandbook,
+  formSubmissions,
+  formSubmissionsError,
+  isFormSubmissionsLoading
 }: OperatorPageProps) {
   const handbookExists = Boolean(handbookStatus?.exists);
   const handbookCharCount = handbookStatus?.charCount ?? 0;
@@ -152,6 +166,8 @@ export function OperatorPage({
             {addTenantError ? <p className="operator-error">{addTenantError}</p> : null}
             <p>
               <a href="/admin/form-builder">Open Intake Form Builder</a>
+              {" · "}
+              <a href={`/intake?tenant=${encodeURIComponent(tenantId)}`}>Preview public intake link</a>
             </p>
           </header>
 
@@ -173,6 +189,15 @@ export function OperatorPage({
               onClick={() => onSetActiveTab("questionLog")}
             >
               Question Log
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "intakeSubmissions"}
+              className={`operator-tab ${activeTab === "intakeSubmissions" ? "active" : ""}`}
+              onClick={() => onSetActiveTab("intakeSubmissions")}
+            >
+              Intake Submissions
             </button>
           </div>
 
@@ -233,6 +258,55 @@ export function OperatorPage({
                       onChange={(event) => void onReplaceSelection(event)}
                       disabled={isHandbookSaving || isHandbookRemoving}
                     />
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {activeTab === "intakeSubmissions" ? (
+              <div className="operator-section">
+                <h2>Intake Submissions</h2>
+                {isFormSubmissionsLoading ? <p>Loading submissions...</p> : null}
+                {formSubmissionsError ? <p className="operator-error">{formSubmissionsError}</p> : null}
+                {!isFormSubmissionsLoading &&
+                !formSubmissionsError &&
+                formSubmissions.length === 0 ? (
+                  <p>No intake submissions yet.</p>
+                ) : null}
+
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length > 0 ? (
+                  <div className="logs-table-wrap">
+                    <table className="logs-table">
+                      <thead>
+                        <tr>
+                          <th>Time</th>
+                          <th>Contact</th>
+                          <th>Details</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formSubmissions.map((row) => (
+                          <tr key={row.id}>
+                            <td>{new Date(row.submittedAt).toLocaleString()}</td>
+                            <td>
+                              {row.submitterName || row.submitterEmail ? (
+                                <>
+                                  {row.submitterName ? <div>{row.submitterName}</div> : null}
+                                  {row.submitterEmail ? (
+                                    <div className="intake-email">{row.submitterEmail}</div>
+                                  ) : null}
+                                </>
+                              ) : (
+                                "—"
+                              )}
+                            </td>
+                            <td className="intake-formdata">
+                              <pre>{JSON.stringify(row.formData, null, 2)}</pre>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 ) : null}
               </div>

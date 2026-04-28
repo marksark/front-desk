@@ -511,6 +511,20 @@ body,
   background: #f2f2f2;
 }
 
+.intake-formdata pre {
+  margin: 0;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 12rem;
+  overflow: auto;
+}
+
+.intake-email {
+  font-size: 0.9rem;
+  color: #374151;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
