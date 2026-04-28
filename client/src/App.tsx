@@ -86,7 +86,24 @@ function App() {
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const replaceInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [activeTab, setActiveTab] = useState<OperatorTab>("handbook");
+  const initialOperatorTab = useMemo<OperatorTab>(() => {
+    if (typeof window === "undefined") {
+      return "handbook";
+    }
+    const params = new URLSearchParams(window.location.search);
+    return params.get("view") === "questionLog" ? "questionLog" : "handbook";
+  }, []);
+  const [activeTab, setActiveTab] = useState<OperatorTab>(initialOperatorTab);
+
+  const handleOperatorTabChange = useCallback((tab: OperatorTab) => {
+    setActiveTab(tab);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      params.set("view", tab);
+      const next = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, "", next);
+    }
+  }, []);
   const [handbookStatus, setHandbookStatus] = useState<HandbookStatusResponse | null>(null);
   const [selectedHandbookFile, setSelectedHandbookFile] = useState<File | null>(null);
   const [handbookError, setHandbookError] = useState<string | null>(null);
@@ -104,11 +121,9 @@ function App() {
   const isChatRoute = routePath === "/chat";
   const isOperatorRoute = routePath === "/operator";
   const isFormBuilderRoute = routePath === "/admin/form-builder";
-  const persistentNavTarget = isFormBuilderRoute
-    ? { href: "/operator", label: "Back to Operator Dashboard" }
-    : isOperatorRoute
-      ? { href: "/chat", label: "Go to Parent Chat" }
-      : { href: "/operator", label: "Go to Operator Dashboard" };
+  const persistentNavTarget = isChatRoute
+    ? { href: "/operator", label: "Operator Dashboard" }
+    : { href: "/chat", label: "Parent Chat" };
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -355,9 +370,6 @@ function App() {
     return (
       <FormBuilderProviders>
         <FormBuilderPage />
-        <a className="persistent-nav-button" href={persistentNavTarget.href}>
-          {persistentNavTarget.label}
-        </a>
       </FormBuilderProviders>
     );
   }
@@ -384,9 +396,8 @@ function App() {
         isLogsLoading={isLogsLoading}
         uploadInputRef={uploadInputRef}
         replaceInputRef={replaceInputRef}
-        persistentNavTarget={persistentNavTarget}
         truncateAnswer={truncateAnswer}
-        onSetActiveTab={setActiveTab}
+        onSetActiveTab={handleOperatorTabChange}
         onUploadFileChange={handleUploadFileChange}
         onHandbookUpload={handleHandbookUpload}
         onReplaceSelection={handleReplaceSelection}

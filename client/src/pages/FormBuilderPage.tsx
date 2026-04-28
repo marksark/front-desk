@@ -8,6 +8,7 @@ import {
   setUISchema
 } from "../json-form-builder/store/slice.js";
 import { useTenant } from "../tenant/TenantContext";
+import { OperatorNav } from "./OperatorNav";
 
 export function FormBuilderPage() {
   const { tenantId } = useTenant();
@@ -47,39 +48,45 @@ export function FormBuilderPage() {
 
   if (isLoading) {
     return (
-      <Container maxWidth="xl">
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "50vh"
-          }}
-        >
-          <CircularProgress aria-label="Loading form template" />
-        </Box>
-      </Container>
+      <div className="operator-page">
+        <OperatorNav activeView="formBuilder" />
+        <Container maxWidth="xl">
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "50vh"
+            }}
+          >
+            <CircularProgress aria-label="Loading form template" />
+          </Box>
+        </Container>
+      </div>
     );
   }
 
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          Intake Form Builder
-        </Typography>
-        <Typography variant="h6" component="h2" gutterBottom>
-          Drag and drop form builder
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary" gutterBottom sx={{ mb: 4 }}>
-          Building for: <strong>{tenantId}</strong>
-        </Typography>
-        <FormBuilderApp
-          formTemplate={null}
-          tenantId={tenantId}
-          hasSavedTemplate={hasSavedTemplate}
-        />
-      </Box>
-    </Container>
+    <div className="operator-page">
+      <OperatorNav activeView="formBuilder" />
+      <Container maxWidth="xl">
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h2" component="h1" gutterBottom>
+            Intake Form Builder
+          </Typography>
+          <Typography variant="h6" component="h2" gutterBottom>
+            Drag and drop form builder
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary" gutterBottom sx={{ mb: 4 }}>
+            Building for: <strong>{tenantId}</strong>
+          </Typography>
+          <FormBuilderApp
+            formTemplate={null}
+            tenantId={tenantId}
+            hasSavedTemplate={hasSavedTemplate}
+          />
+        </Box>
+      </Container>
+    </div>
   );
 }

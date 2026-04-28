@@ -1,5 +1,6 @@
 import { ChangeEvent, ChangeEventHandler, FormEvent, RefObject, useState } from "react";
 import type { Tenant } from "../tenant/TenantContext";
+import { OperatorNav } from "./OperatorNav";
 
 type OperatorTab = "handbook" | "questionLog";
 
@@ -14,11 +15,6 @@ interface LogEntry {
   answer: string;
   timestamp: string;
   wasUncertain: boolean;
-}
-
-interface PersistentNavTarget {
-  href: string;
-  label: string;
 }
 
 interface OperatorPageProps {
@@ -41,7 +37,6 @@ interface OperatorPageProps {
   isLogsLoading: boolean;
   uploadInputRef: RefObject<HTMLInputElement | null>;
   replaceInputRef: RefObject<HTMLInputElement | null>;
-  persistentNavTarget: PersistentNavTarget;
   truncateAnswer: (answer: string) => string;
   onSetActiveTab: (tab: OperatorTab) => void;
   onUploadFileChange: ChangeEventHandler<HTMLInputElement>;
@@ -70,7 +65,6 @@ export function OperatorPage({
   isLogsLoading,
   uploadInputRef,
   replaceInputRef,
-  persistentNavTarget,
   truncateAnswer,
   onSetActiveTab,
   onUploadFileChange,
@@ -110,84 +104,98 @@ export function OperatorPage({
   };
 
   return (
-    <>
-      <main className="operator-page">
+    <div className="operator-page">
+      <OperatorNav activeView={activeTab} />
+
+      <main className="operator-main">
         <section className="operator-shell">
           <header className="operator-header">
-            <h1>Operator Dashboard</h1>
-            <div className="operator-tenant-controls">
-              <label className="operator-tenant-label">
-                <span>Tenant:</span>
-                <select
-                  className="operator-tenant-select"
-                  value={tenantId}
-                  onChange={(event) => onTenantChange(event.target.value)}
-                  disabled={isTenantsLoading}
-                >
-                  {dropdownOptions.map((tenant) => (
-                    <option key={tenant.id} value={tenant.id}>
-                      {tenant.id}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <form className="operator-add-tenant" onSubmit={handleAddTenant}>
-                <input
-                  type="text"
-                  placeholder="new-tenant-id"
-                  value={newTenantId}
-                  onChange={(event) => setNewTenantId(event.target.value)}
-                  disabled={isAddingTenant}
-                  aria-label="New tenant id"
-                />
-                <button
-                  type="submit"
-                  disabled={isAddingTenant || newTenantId.trim().length === 0}
-                >
-                  {isAddingTenant ? "Adding..." : "Add tenant"}
-                </button>
-              </form>
+            <div className="operator-header-row">
+              <div>
+                <p className="operator-eyebrow">Operator Dashboard</p>
+                <h1>
+                  {activeTab === "handbook" ? "Handbook" : "Question Log"}
+                </h1>
+                <p className="operator-subtitle">
+                  {activeTab === "handbook"
+                    ? "Upload and manage the handbook the AI answers from."
+                    : "Review every question parents have asked and how the AI responded."}
+                </p>
+              </div>
+              <div className="operator-tenant-controls">
+                <label className="operator-tenant-label">
+                  <span>Tenant</span>
+                  <select
+                    className="operator-tenant-select"
+                    value={tenantId}
+                    onChange={(event) => onTenantChange(event.target.value)}
+                    disabled={isTenantsLoading}
+                  >
+                    {dropdownOptions.map((tenant) => (
+                      <option key={tenant.id} value={tenant.id}>
+                        {tenant.id}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <form className="operator-add-tenant" onSubmit={handleAddTenant}>
+                  <input
+                    type="text"
+                    placeholder="new-tenant-id"
+                    value={newTenantId}
+                    onChange={(event) => setNewTenantId(event.target.value)}
+                    disabled={isAddingTenant}
+                    aria-label="New tenant id"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isAddingTenant || newTenantId.trim().length === 0}
+                  >
+                    {isAddingTenant ? "Adding..." : "Add tenant"}
+                  </button>
+                </form>
+              </div>
             </div>
             {tenantsError ? <p className="operator-error">{tenantsError}</p> : null}
             {addTenantError ? <p className="operator-error">{addTenantError}</p> : null}
-            <p>
-              <a href="/admin/form-builder">Open Intake Form Builder</a>
-            </p>
           </header>
 
-          <div className="operator-tabs" role="tablist" aria-label="Operator tabs">
+          <div className="operator-segmented" role="tablist" aria-label="Operator section">
             <button
               type="button"
               role="tab"
               aria-selected={activeTab === "handbook"}
-              className={`operator-tab ${activeTab === "handbook" ? "active" : ""}`}
+              className={`operator-segment${activeTab === "handbook" ? " active" : ""}`}
               onClick={() => onSetActiveTab("handbook")}
             >
-              Handbook
+              <span aria-hidden="true">📘</span> Handbook
             </button>
             <button
               type="button"
               role="tab"
               aria-selected={activeTab === "questionLog"}
-              className={`operator-tab ${activeTab === "questionLog" ? "active" : ""}`}
+              className={`operator-segment${activeTab === "questionLog" ? " active" : ""}`}
               onClick={() => onSetActiveTab("questionLog")}
             >
-              Question Log
+              <span aria-hidden="true">📝</span> Question Log
             </button>
           </div>
 
           <section className="operator-panel">
             {activeTab === "handbook" ? (
               <div className="operator-section">
-                <h2>Handbook</h2>
-                <h5><strong> Uploads are disabled in the hosted demo. Run locally to manage your handbook. </strong></h5>
+                <p className="operator-demo-note">
+                  Uploads are disabled in the hosted demo. Run locally to manage your handbook.
+                </p>
                 {isHandbookLoading ? <p>Loading handbook status...</p> : null}
                 {handbookError ? <p className="operator-error">{handbookError}</p> : null}
                 {handbookNotice ? <p className="operator-success">{handbookNotice}</p> : null}
 
                 {!isHandbookLoading && !handbookExists ? (
                   <div className="handbook-actions">
-                    <p>No handbook uploaded yet.</p>
+                    <p className="handbook-status empty">
+                      <span aria-hidden="true">📂</span> No handbook uploaded yet.
+                    </p>
                     <input
                       ref={uploadInputRef}
                       type="file"
@@ -197,6 +205,7 @@ export function OperatorPage({
                     />
                     <button
                       type="button"
+                      className="primary-button"
                       onClick={() => void onHandbookUpload()}
                       disabled={!selectedHandbookFile || isHandbookSaving || isHandbookRemoving}
                     >
@@ -207,10 +216,13 @@ export function OperatorPage({
 
                 {!isHandbookLoading && handbookExists ? (
                   <div className="handbook-actions">
-                    <p>Handbook loaded — {handbookCharCount} characters</p>
+                    <p className="handbook-status loaded">
+                      <span aria-hidden="true">✅</span> Handbook loaded — {handbookCharCount.toLocaleString()} characters
+                    </p>
                     <div className="inline-actions">
                       <button
                         type="button"
+                        className="secondary-button"
                         onClick={() => replaceInputRef.current?.click()}
                         disabled={isHandbookSaving || isHandbookRemoving}
                       >
@@ -218,7 +230,7 @@ export function OperatorPage({
                       </button>
                       <button
                         type="button"
-                        className="danger"
+                        className="danger-button"
                         onClick={() => void onRemoveHandbook()}
                         disabled={isHandbookSaving || isHandbookRemoving}
                       >
@@ -240,10 +252,11 @@ export function OperatorPage({
 
             {activeTab === "questionLog" ? (
               <div className="operator-section">
-                <h2>Question Log</h2>
                 {isLogsLoading ? <p>Loading logs...</p> : null}
                 {logsError ? <p className="operator-error">{logsError}</p> : null}
-                {!isLogsLoading && !logsError && logs.length === 0 ? <p>No questions asked yet.</p> : null}
+                {!isLogsLoading && !logsError && logs.length === 0 ? (
+                  <p className="operator-empty">No questions asked yet.</p>
+                ) : null}
 
                 {!isLogsLoading && !logsError && logs.length > 0 ? (
                   <div className="logs-table-wrap">
@@ -262,7 +275,13 @@ export function OperatorPage({
                             <td>{new Date(log.timestamp).toLocaleString()}</td>
                             <td>{log.question}</td>
                             <td>{truncateAnswer(log.answer)}</td>
-                            <td>{log.wasUncertain ? "⚠️ Uncertain" : "✅ Answered"}</td>
+                            <td>
+                              <span
+                                className={`status-badge${log.wasUncertain ? " uncertain" : " ok"}`}
+                              >
+                                {log.wasUncertain ? "⚠️ Uncertain" : "✅ Answered"}
+                              </span>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -273,10 +292,7 @@ export function OperatorPage({
             ) : null}
           </section>
         </section>
-      </main >
-      <a className="persistent-nav-button" href={persistentNavTarget.href}>
-        {persistentNavTarget.label}
-      </a>
-    </>
+      </main>
+    </div>
   );
 }
