@@ -1,7 +1,7 @@
 import { ChangeEvent, ChangeEventHandler, FormEvent, RefObject, useState } from "react";
 import type { Tenant } from "../tenant/TenantContext";
 
-type OperatorTab = "handbook" | "questionLog";
+type OperatorTab = "handbook" | "questionLog" | "formSubmissions";
 
 interface HandbookStatus {
   exists: boolean;
@@ -14,6 +14,12 @@ interface LogEntry {
   answer: string;
   timestamp: string;
   wasUncertain: boolean;
+}
+
+interface FormSubmissionEntry {
+  id: string;
+  submittedAt: string;
+  formData: Record<string, unknown>;
 }
 
 interface PersistentNavTarget {
@@ -39,6 +45,9 @@ interface OperatorPageProps {
   logs: LogEntry[];
   logsError: string | null;
   isLogsLoading: boolean;
+  formSubmissions: FormSubmissionEntry[];
+  formSubmissionsError: string | null;
+  isFormSubmissionsLoading: boolean;
   uploadInputRef: RefObject<HTMLInputElement | null>;
   replaceInputRef: RefObject<HTMLInputElement | null>;
   persistentNavTarget: PersistentNavTarget;
@@ -68,6 +77,9 @@ export function OperatorPage({
   logs,
   logsError,
   isLogsLoading,
+  formSubmissions,
+  formSubmissionsError,
+  isFormSubmissionsLoading,
   uploadInputRef,
   replaceInputRef,
   persistentNavTarget,
@@ -80,6 +92,18 @@ export function OperatorPage({
 }: OperatorPageProps) {
   const handbookExists = Boolean(handbookStatus?.exists);
   const handbookCharCount = handbookStatus?.charCount ?? 0;
+
+  const formatFormDataPreview = (data: Record<string, unknown>): string => {
+    try {
+      const text = JSON.stringify(data, null, 0);
+      if (text.length <= 120) {
+        return text;
+      }
+      return `${text.slice(0, 120)}…`;
+    } catch {
+      return "(unable to display)";
+    }
+  };
 
   const [newTenantId, setNewTenantId] = useState("");
   const [addTenantError, setAddTenantError] = useState<string | null>(null);
@@ -174,6 +198,15 @@ export function OperatorPage({
             >
               Question Log
             </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "formSubmissions"}
+              className={`operator-tab ${activeTab === "formSubmissions" ? "active" : ""}`}
+              onClick={() => onSetActiveTab("formSubmissions")}
+            >
+              Form Submissions
+            </button>
           </div>
 
           <section className="operator-panel">
@@ -263,6 +296,47 @@ export function OperatorPage({
                             <td>{log.question}</td>
                             <td>{truncateAnswer(log.answer)}</td>
                             <td>{log.wasUncertain ? "⚠️ Uncertain" : "✅ Answered"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {activeTab === "formSubmissions" ? (
+              <div className="operator-section">
+                <h2>Form Submissions</h2>
+                <h5>
+                  <strong>
+                    In the hosted demo, new submissions are not stored on the server. Run the app
+                    locally to test full submission storage.
+                  </strong>
+                </h5>
+                {isFormSubmissionsLoading ? <p>Loading submissions...</p> : null}
+                {formSubmissionsError ? (
+                  <p className="operator-error">{formSubmissionsError}</p>
+                ) : null}
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length === 0 ? (
+                  <p>No form submissions yet.</p>
+                ) : null}
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length > 0 ? (
+                  <div className="logs-table-wrap">
+                    <table className="logs-table form-submissions-table">
+                      <thead>
+                        <tr>
+                          <th>Submitted</th>
+                          <th>Data</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formSubmissions.map((row) => (
+                          <tr key={row.id}>
+                            <td>{new Date(row.submittedAt).toLocaleString()}</td>
+                            <td className="form-submission-data-cell">
+                              {formatFormDataPreview(row.formData)}
+                            </td>
                           </tr>
                         ))}
                       </tbody>

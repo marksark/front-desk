@@ -286,6 +286,38 @@ body,
   background: #fff8ee;
 }
 
+.landing-button.intake {
+  background: #0d9488;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(13, 148, 136, 0.25);
+}
+
+.landing-button.intake:hover {
+  background: #0f766e;
+}
+
+.intake-page {
+  min-height: 100dvh;
+  background: #f7f4ef;
+  color: #111827;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Helvetica Neue", sans-serif;
+}
+
+.intake-form-shell {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+.intake-rjsf-wrap {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.06);
+}
+
 .persistent-nav-button {
   position: fixed;
   right: 16px;
@@ -509,6 +541,12 @@ body,
 
 .logs-table tbody tr:nth-child(even) {
   background: #f2f2f2;
+}
+
+.form-submissions-table .form-submission-data-cell {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+  font-size: 0.85rem;
 }
 
 .sr-only {
