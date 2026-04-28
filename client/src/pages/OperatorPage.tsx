@@ -1,7 +1,7 @@
 import { ChangeEvent, ChangeEventHandler, FormEvent, RefObject, useState } from "react";
 import type { Tenant } from "../tenant/TenantContext";
 
-type OperatorTab = "handbook" | "questionLog";
+type OperatorTab = "handbook" | "questionLog" | "submissions";
 
 interface HandbookStatus {
   exists: boolean;
@@ -14,6 +14,12 @@ interface LogEntry {
   answer: string;
   timestamp: string;
   wasUncertain: boolean;
+}
+
+interface FormSubmission {
+  id: string;
+  formData: Record<string, unknown>;
+  submittedAt: string;
 }
 
 interface PersistentNavTarget {
@@ -39,6 +45,9 @@ interface OperatorPageProps {
   logs: LogEntry[];
   logsError: string | null;
   isLogsLoading: boolean;
+  formSubmissions: FormSubmission[];
+  formSubmissionsError: string | null;
+  isFormSubmissionsLoading: boolean;
   uploadInputRef: RefObject<HTMLInputElement | null>;
   replaceInputRef: RefObject<HTMLInputElement | null>;
   persistentNavTarget: PersistentNavTarget;
@@ -48,6 +57,18 @@ interface OperatorPageProps {
   onHandbookUpload: () => Promise<void>;
   onReplaceSelection: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   onRemoveHandbook: () => Promise<void>;
+}
+
+function formatSubmissionValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
+
+  if (typeof value === "object") {
+    return JSON.stringify(value);
+  }
+
+  return String(value);
 }
 
 export function OperatorPage({
@@ -68,6 +89,9 @@ export function OperatorPage({
   logs,
   logsError,
   isLogsLoading,
+  formSubmissions,
+  formSubmissionsError,
+  isFormSubmissionsLoading,
   uploadInputRef,
   replaceInputRef,
   persistentNavTarget,
@@ -152,6 +176,8 @@ export function OperatorPage({
             {addTenantError ? <p className="operator-error">{addTenantError}</p> : null}
             <p>
               <a href="/admin/form-builder">Open Intake Form Builder</a>
+              {" · "}
+              <a href="/intake">Open Parent Intake Form</a>
             </p>
           </header>
 
@@ -173,6 +199,15 @@ export function OperatorPage({
               onClick={() => onSetActiveTab("questionLog")}
             >
               Question Log
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "submissions"}
+              className={`operator-tab ${activeTab === "submissions" ? "active" : ""}`}
+              onClick={() => onSetActiveTab("submissions")}
+            >
+              Intake Submissions
             </button>
           </div>
 
@@ -267,6 +302,38 @@ export function OperatorPage({
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {activeTab === "submissions" ? (
+              <div className="operator-section">
+                <h2>Intake Submissions</h2>
+                {isFormSubmissionsLoading ? <p>Loading intake submissions...</p> : null}
+                {formSubmissionsError ? <p className="operator-error">{formSubmissionsError}</p> : null}
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length === 0 ? (
+                  <p>No intake submissions yet.</p>
+                ) : null}
+
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length > 0 ? (
+                  <div className="submission-list">
+                    {formSubmissions.map((submission) => (
+                      <article className="submission-card" key={submission.id}>
+                        <header>
+                          <h3>{new Date(submission.submittedAt).toLocaleString()}</h3>
+                          <span>{submission.id}</span>
+                        </header>
+                        <dl>
+                          {Object.entries(submission.formData).map(([key, value]) => (
+                            <div key={key}>
+                              <dt>{key}</dt>
+                              <dd>{formatSubmissionValue(value)}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </article>
+                    ))}
                   </div>
                 ) : null}
               </div>

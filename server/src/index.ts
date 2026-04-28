@@ -3,6 +3,7 @@ import express from "express";
 import path from "path";
 import { config as loadEnv } from "dotenv";
 import chatRoutes from "./routes/chat";
+import formSubmissionRoutes from "./routes/formSubmissions";
 import formTemplateRoutes from "./routes/formTemplate";
 import handbookRoutes from "./routes/handbook";
 import logsRoutes from "./routes/logs";
@@ -35,6 +36,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 app.use("/api/chat", chatRoutes);
+app.use("/api/form-submissions", formSubmissionRoutes);
 app.use("/api/form-template", formTemplateRoutes);
 app.use("/api/handbook", handbookRoutes);
 app.use("/api/logs", logsRoutes);

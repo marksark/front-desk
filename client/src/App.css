@@ -276,6 +276,16 @@ body,
   background: #d99006;
 }
 
+.landing-button.intake {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
+}
+
+.landing-button.intake:hover {
+  background: #1d4ed8;
+}
+
 .landing-button.staff {
   background: #ffffff;
   border: 1px solid #d8c5aa;
@@ -396,6 +406,7 @@ body,
 
 .operator-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   border-bottom: 1px solid #e5e7eb;
   margin-bottom: 16px;
@@ -511,6 +522,153 @@ body,
   background: #f2f2f2;
 }
 
+.submission-list {
+  display: grid;
+  gap: 12px;
+}
+
+.submission-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+  padding: 14px;
+}
+
+.submission-card header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.submission-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.submission-card span {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.submission-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.submission-card dl div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.35fr) 1fr;
+  gap: 12px;
+}
+
+.submission-card dt {
+  color: #4b5563;
+  font-weight: 700;
+}
+
+.submission-card dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+.intake-page {
+  min-height: 100dvh;
+  background: radial-gradient(circle at top, #eff6ff 0%, #f7f4ef 42%, #ffffff 100%);
+  color: #111827;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Helvetica Neue", sans-serif;
+  padding: 72px 16px 32px;
+}
+
+.intake-shell {
+  width: min(680px, 100%);
+  margin: 0 auto;
+}
+
+.intake-header {
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.intake-kicker {
+  margin: 0 0 6px;
+  color: #2563eb;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+
+.intake-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.intake-header p {
+  margin: 8px auto 0;
+  max-width: 44ch;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.intake-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.08);
+  padding: clamp(18px, 4vw, 30px);
+}
+
+.intake-card form {
+  display: grid;
+  gap: 16px;
+}
+
+.intake-submit-button,
+.intake-success button {
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 12px 18px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.intake-submit-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.intake-empty,
+.intake-success {
+  text-align: center;
+}
+
+.intake-empty h2,
+.intake-success h2 {
+  margin: 0;
+}
+
+.intake-empty p,
+.intake-success p {
+  color: #4b5563;
+}
+
+.intake-error {
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #b42318;
+  padding: 10px 12px;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -556,5 +714,10 @@ body,
 
   .chat-input-bar {
     padding: 10px;
+  }
+
+  .submission-card dl div {
+    grid-template-columns: 1fr;
+    gap: 2px;
   }
 }

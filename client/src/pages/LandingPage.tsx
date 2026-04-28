@@ -8,6 +8,9 @@ function LandingPage() {
           <a className="landing-button parent" href="/chat">
             💬 I&apos;m a Parent
           </a>
+          <a className="landing-button intake" href="/intake">
+            📝 Start Intake Form
+          </a>
           <a className="landing-button staff" href="/operator">
             ⚙️ I&apos;m a Staff Member
           </a>

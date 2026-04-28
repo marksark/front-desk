@@ -19,3 +19,15 @@ export interface FormTemplate {
   uiSchema: Record<string, unknown>;
   updatedAt: string;
 }
+
+export interface FormSubmission {
+  id: string;
+  tenantId: string;
+  formData: Record<string, unknown>;
+  submittedAt: string;
+}
+
+export interface FormSubmissionCollection {
+  tenantId: string;
+  submissions: FormSubmission[];
+}

@@ -21,6 +21,7 @@ function FormWithWidgets({
   validator,
   readonly,
   liveValidate,
+  onChange,
   onSubmit,
   children,
 }) {
@@ -32,6 +33,7 @@ function FormWithWidgets({
       validator={validator}
       readonly={readonly}
       liveValidate={liveValidate}
+      onChange={onChange}
       onSubmit={onSubmit}
       // eslint-disable-next-line react/no-children-prop
       children={children}
@@ -58,6 +60,7 @@ FormWithWidgets.propTypes = {
   validator: PropTypes.object,
   readonly: PropTypes.bool,
   liveValidate: PropTypes.bool,
+  onChange: PropTypes.func,
   onSubmit: PropTypes.func,
   children: PropTypes.node,
 };
