@@ -145,6 +145,9 @@ function IntakeFormInner() {
       ) : null}
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }} aria-label="Intake form">
+        <Typography variant="caption" color="text.secondary" component="p">
+          Optional — your contact info is saved with this submission
+        </Typography>
         <TextField
           label="Your name (optional)"
           value={submitterName}
