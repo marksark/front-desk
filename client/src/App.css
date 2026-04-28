@@ -344,7 +344,7 @@ body,
   gap: 20px;
 }
 
-.operator-eyebrow {
+.operator-header .operator-eyebrow {
   margin: 0 0 6px;
   color: #2563eb;
   font-size: 0.78rem;
