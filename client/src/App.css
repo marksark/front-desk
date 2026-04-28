@@ -6,6 +6,10 @@ body,
   background: #f7f4ef;
 }
 
+body {
+  overflow-x: hidden;
+}
+
 .chat-page {
   min-height: 100dvh;
   margin: 0;
