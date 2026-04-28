@@ -105,7 +105,7 @@ export function OperatorPage({
 
   return (
     <div className="operator-page">
-      <OperatorNav activeView={activeTab} />
+      <OperatorNav activeView={activeTab} hideHandbookAndQuestionLogTabs />
 
       <main className="operator-main">
         <section className="operator-shell">

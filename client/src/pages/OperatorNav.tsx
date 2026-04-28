@@ -2,6 +2,8 @@ import type { OperatorView } from "./operatorViews";
 
 interface OperatorNavProps {
   activeView: OperatorView;
+  /** On the operator dashboard, Handbook / Question Log use in-page controls; omit duplicate top tabs. */
+  hideHandbookAndQuestionLogTabs?: boolean;
 }
 
 interface NavItem {
@@ -17,7 +19,14 @@ const NAV_ITEMS: NavItem[] = [
   { view: "formBuilder", label: "Intake Form", href: "/admin/form-builder", icon: "🧩" }
 ];
 
-export function OperatorNav({ activeView }: OperatorNavProps) {
+export function OperatorNav({
+  activeView,
+  hideHandbookAndQuestionLogTabs = false
+}: OperatorNavProps) {
+  const navItems = hideHandbookAndQuestionLogTabs
+    ? NAV_ITEMS.filter((item) => item.view === "formBuilder")
+    : NAV_ITEMS;
+
   return (
     <nav className="operator-nav" aria-label="Operator sections">
       <a className="operator-nav-brand" href="/" aria-label="Sunshine Academy home">
@@ -26,7 +35,7 @@ export function OperatorNav({ activeView }: OperatorNavProps) {
       </a>
 
       <div className="operator-nav-tabs" role="tablist" aria-label="Operator views">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const isActive = item.view === activeView;
           return (
             <a
