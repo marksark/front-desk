@@ -17,6 +17,31 @@ interface IntakeFormPageProps {
   };
 }
 
+function stripHtml(value: string): string {
+  const element = document.createElement("div");
+  element.innerHTML = value;
+  return element.textContent?.trim() || value;
+}
+
+function normalizeSchemaDescriptions(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(normalizeSchemaDescriptions);
+  }
+
+  if (typeof value !== "object" || value === null) {
+    return value;
+  }
+
+  return Object.fromEntries(
+    Object.entries(value).map(([key, entry]) => [
+      key,
+      key === "description" && typeof entry === "string"
+        ? stripHtml(entry)
+        : normalizeSchemaDescriptions(entry)
+    ])
+  );
+}
+
 export function IntakeFormPage({ persistentNavTarget }: IntakeFormPageProps) {
   const { tenantId } = useTenant();
   const [template, setTemplate] = useState<FormTemplate | null>(null);
@@ -33,6 +58,10 @@ export function IntakeFormPage({ persistentNavTarget }: IntakeFormPageProps) {
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join(" "),
     [tenantId]
+  );
+  const publicJsonSchema = useMemo(
+    () => template ? normalizeSchemaDescriptions(template.jsonSchema) as Record<string, unknown> : null,
+    [template]
   );
 
   const loadTemplate = useCallback(async () => {
@@ -127,11 +156,11 @@ export function IntakeFormPage({ persistentNavTarget }: IntakeFormPageProps) {
               </div>
             ) : null}
 
-            {!isLoading && template && submitState !== "submitted" ? (
+            {!isLoading && template && publicJsonSchema && submitState !== "submitted" ? (
               <>
                 {submitError ? <p className="intake-error">{submitError}</p> : null}
                 <FormWithWidgets
-                  schema={template.jsonSchema}
+                  schema={publicJsonSchema}
                   uiSchema={template.uiSchema}
                   formData={formData}
                   validator={validator}
