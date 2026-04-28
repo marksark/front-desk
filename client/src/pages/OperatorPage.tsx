@@ -1,7 +1,7 @@
 import { ChangeEvent, ChangeEventHandler, FormEvent, RefObject, useState } from "react";
 import type { Tenant } from "../tenant/TenantContext";
 
-type OperatorTab = "handbook" | "questionLog";
+type OperatorTab = "handbook" | "questionLog" | "formSubmissions";
 
 interface HandbookStatus {
   exists: boolean;
@@ -14,6 +14,13 @@ interface LogEntry {
   answer: string;
   timestamp: string;
   wasUncertain: boolean;
+}
+
+interface FormSubmissionEntry {
+  id: string;
+  tenantId: string;
+  data: Record<string, unknown>;
+  submittedAt: string;
 }
 
 interface PersistentNavTarget {
@@ -39,6 +46,9 @@ interface OperatorPageProps {
   logs: LogEntry[];
   logsError: string | null;
   isLogsLoading: boolean;
+  formSubmissions: FormSubmissionEntry[];
+  formSubmissionsError: string | null;
+  isFormSubmissionsLoading: boolean;
   uploadInputRef: RefObject<HTMLInputElement | null>;
   replaceInputRef: RefObject<HTMLInputElement | null>;
   persistentNavTarget: PersistentNavTarget;
@@ -68,6 +78,9 @@ export function OperatorPage({
   logs,
   logsError,
   isLogsLoading,
+  formSubmissions,
+  formSubmissionsError,
+  isFormSubmissionsLoading,
   uploadInputRef,
   replaceInputRef,
   persistentNavTarget,
@@ -151,6 +164,8 @@ export function OperatorPage({
             {tenantsError ? <p className="operator-error">{tenantsError}</p> : null}
             {addTenantError ? <p className="operator-error">{addTenantError}</p> : null}
             <p>
+              <a href="/form">Open public form intake (parents)</a>
+              {" · "}
               <a href="/admin/form-builder">Open Intake Form Builder</a>
             </p>
           </header>
@@ -173,6 +188,15 @@ export function OperatorPage({
               onClick={() => onSetActiveTab("questionLog")}
             >
               Question Log
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "formSubmissions"}
+              className={`operator-tab ${activeTab === "formSubmissions" ? "active" : ""}`}
+              onClick={() => onSetActiveTab("formSubmissions")}
+            >
+              Form Intake
             </button>
           </div>
 
@@ -263,6 +287,46 @@ export function OperatorPage({
                             <td>{log.question}</td>
                             <td>{truncateAnswer(log.answer)}</td>
                             <td>{log.wasUncertain ? "⚠️ Uncertain" : "✅ Answered"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {activeTab === "formSubmissions" ? (
+              <div className="operator-section">
+                <h2>Form Intake</h2>
+                <h5>
+                  <strong> Submissions are read-only. Run the app locally to collect new responses. </strong>
+                </h5>
+                {isFormSubmissionsLoading ? <p>Loading form submissions...</p> : null}
+                {formSubmissionsError ? (
+                  <p className="operator-error">{formSubmissionsError}</p>
+                ) : null}
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length === 0 ? (
+                  <p>No form submissions yet.</p>
+                ) : null}
+                {!isFormSubmissionsLoading && !formSubmissionsError && formSubmissions.length > 0 ? (
+                  <div className="logs-table-wrap">
+                    <table className="logs-table" aria-label="Form submissions">
+                      <thead>
+                        <tr>
+                          <th>Time</th>
+                          <th>Submitted data</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formSubmissions.map((row) => (
+                          <tr key={row.id}>
+                            <td>{new Date(row.submittedAt).toLocaleString()}</td>
+                            <td>
+                              <code className="form-submission-json">
+                                {truncateAnswer(JSON.stringify(row.data))}
+                              </code>
+                            </td>
                           </tr>
                         ))}
                       </tbody>

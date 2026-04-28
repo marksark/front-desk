@@ -511,6 +511,13 @@ body,
   background: #f2f2f2;
 }
 
+.form-submission-json {
+  display: block;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
