@@ -384,7 +384,6 @@ function App() {
         isLogsLoading={isLogsLoading}
         uploadInputRef={uploadInputRef}
         replaceInputRef={replaceInputRef}
-        persistentNavTarget={persistentNavTarget}
         truncateAnswer={truncateAnswer}
         onSetActiveTab={setActiveTab}
         onUploadFileChange={handleUploadFileChange}
