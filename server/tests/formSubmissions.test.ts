@@ -65,4 +65,24 @@ describe("/api/form-submissions", () => {
 
     expect(res.body.error).toMatch(/template not found/i);
   });
+
+  it("POST /:tenantId returns 403 when VERCEL=1 (hosted demo)", async () => {
+    const prevVercel = process.env.VERCEL;
+    tenantId = await makeTestTenant();
+    process.env.VERCEL = "1";
+    try {
+      const res = await request(app)
+        .post(`/api/form-submissions/${tenantId}`)
+        .send({ formData: { childName: "Avery" } })
+        .expect(403);
+
+      expect(res.body.error).toMatch(/disabled/i);
+    } finally {
+      if (prevVercel === undefined) {
+        delete process.env.VERCEL;
+      } else {
+        process.env.VERCEL = prevVercel;
+      }
+    }
+  });
 });

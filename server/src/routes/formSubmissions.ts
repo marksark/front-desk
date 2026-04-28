@@ -1,12 +1,9 @@
 import { Router } from "express";
 import { getFormTemplate } from "../lib/formTemplateStore";
 import { getFormSubmissionCollection, saveFormSubmission } from "../lib/formSubmissionStore";
+import { isPlainObject } from "../lib/isPlainObject";
 
 const router = Router();
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 router.get("/:tenantId", async (req, res) => {
   const { tenantId } = req.params;
@@ -15,6 +12,12 @@ router.get("/:tenantId", async (req, res) => {
 });
 
 router.post("/:tenantId", async (req, res) => {
+  if (process.env.VERCEL === "1") {
+    return res.status(403).json({
+      error: "Saving form submissions is disabled in the hosted demo."
+    });
+  }
+
   const { tenantId } = req.params;
   const body = req.body as { formData?: unknown };
 

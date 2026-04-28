@@ -36,15 +36,13 @@ export async function saveFormSubmission(
     submittedAt: new Date().toISOString()
   };
 
-  if (process.env.VERCEL !== "1") {
-    const tenantDir = getTenantDir(tenantId);
-    await mkdir(tenantDir, { recursive: true });
-    await writeFile(
-      getSubmissionsPath(tenantId),
-      JSON.stringify({ tenantId, submissions: [...collection.submissions, submission] }, null, 2),
-      "utf-8"
-    );
-  }
+  const tenantDir = getTenantDir(tenantId);
+  await mkdir(tenantDir, { recursive: true });
+  await writeFile(
+    getSubmissionsPath(tenantId),
+    JSON.stringify({ tenantId, submissions: [...collection.submissions, submission] }, null, 2),
+    "utf-8"
+  );
 
   return submission;
 }

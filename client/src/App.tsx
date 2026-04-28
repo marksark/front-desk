@@ -125,11 +125,13 @@ function App() {
   const isIntakeRoute = routePath === "/intake";
   const isOperatorRoute = routePath === "/operator";
   const isFormBuilderRoute = routePath === "/admin/form-builder";
-  const persistentNavTarget = isFormBuilderRoute || isIntakeRoute
+  const persistentNavTarget = isFormBuilderRoute
     ? { href: "/operator", label: "Back to Operator Dashboard" }
-    : isOperatorRoute
-      ? { href: "/chat", label: "Go to Parent Chat" }
-      : { href: "/operator", label: "Go to Operator Dashboard" };
+    : isIntakeRoute
+      ? { href: "/", label: "Back to Home" }
+      : isOperatorRoute
+        ? { href: "/chat", label: "Go to Parent Chat" }
+        : { href: "/operator", label: "Go to Operator Dashboard" };
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });

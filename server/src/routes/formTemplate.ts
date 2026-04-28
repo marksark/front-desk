@@ -4,12 +4,9 @@ import {
   getFormTemplate,
   saveFormTemplate
 } from "../lib/formTemplateStore";
+import { isPlainObject } from "../lib/isPlainObject";
 
 const router = Router();
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 router.get("/:tenantId", async (req, res) => {
   const { tenantId } = req.params;
