@@ -16,11 +16,6 @@ interface LogEntry {
   wasUncertain: boolean;
 }
 
-interface PersistentNavTarget {
-  href: string;
-  label: string;
-}
-
 interface OperatorPageProps {
   tenantId: string;
   tenants: Tenant[];
@@ -41,7 +36,6 @@ interface OperatorPageProps {
   isLogsLoading: boolean;
   uploadInputRef: RefObject<HTMLInputElement | null>;
   replaceInputRef: RefObject<HTMLInputElement | null>;
-  persistentNavTarget: PersistentNavTarget;
   truncateAnswer: (answer: string) => string;
   onSetActiveTab: (tab: OperatorTab) => void;
   onUploadFileChange: ChangeEventHandler<HTMLInputElement>;
@@ -70,7 +64,6 @@ export function OperatorPage({
   isLogsLoading,
   uploadInputRef,
   replaceInputRef,
-  persistentNavTarget,
   truncateAnswer,
   onSetActiveTab,
   onUploadFileChange,
@@ -110,73 +103,91 @@ export function OperatorPage({
   };
 
   return (
-    <>
-      <main className="operator-page">
-        <section className="operator-shell">
-          <header className="operator-header">
-            <h1>Operator Dashboard</h1>
-            <div className="operator-tenant-controls">
-              <label className="operator-tenant-label">
-                <span>Tenant:</span>
-                <select
-                  className="operator-tenant-select"
-                  value={tenantId}
-                  onChange={(event) => onTenantChange(event.target.value)}
-                  disabled={isTenantsLoading}
-                >
-                  {dropdownOptions.map((tenant) => (
-                    <option key={tenant.id} value={tenant.id}>
-                      {tenant.id}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <form className="operator-add-tenant" onSubmit={handleAddTenant}>
-                <input
-                  type="text"
-                  placeholder="new-tenant-id"
-                  value={newTenantId}
-                  onChange={(event) => setNewTenantId(event.target.value)}
-                  disabled={isAddingTenant}
-                  aria-label="New tenant id"
-                />
-                <button
-                  type="submit"
-                  disabled={isAddingTenant || newTenantId.trim().length === 0}
-                >
-                  {isAddingTenant ? "Adding..." : "Add tenant"}
-                </button>
-              </form>
-            </div>
-            {tenantsError ? <p className="operator-error">{tenantsError}</p> : null}
-            {addTenantError ? <p className="operator-error">{addTenantError}</p> : null}
-            <p>
-              <a href="/admin/form-builder">Open Intake Form Builder</a>
-            </p>
-          </header>
+    <main className="operator-page">
+      <div className="operator-topbar">
+        <nav className="operator-app-nav" aria-label="Main pages">
+          <a className="operator-app-nav-link" href="/chat">
+            Parent chat
+          </a>
+          <span className="operator-app-nav-current" aria-current="page">
+            Operator
+          </span>
+          <a className="operator-app-nav-link" href="/admin/form-builder">
+            Form builder
+          </a>
+        </nav>
+      </div>
 
-          <div className="operator-tabs" role="tablist" aria-label="Operator tabs">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === "handbook"}
-              className={`operator-tab ${activeTab === "handbook" ? "active" : ""}`}
-              onClick={() => onSetActiveTab("handbook")}
+      <section className="operator-shell">
+        <header className="operator-header">
+          <div className="operator-header-row">
+            <h1>Operator</h1>
+            <div
+              className="operator-segment"
+              role="tablist"
+              aria-label="Handbook and question log"
             >
-              Handbook
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === "questionLog"}
-              className={`operator-tab ${activeTab === "questionLog" ? "active" : ""}`}
-              onClick={() => onSetActiveTab("questionLog")}
-            >
-              Question Log
-            </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === "handbook"}
+                className={`operator-segment-btn ${activeTab === "handbook" ? "active" : ""}`}
+                onClick={() => onSetActiveTab("handbook")}
+              >
+                Handbook
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === "questionLog"}
+                className={`operator-segment-btn ${activeTab === "questionLog" ? "active" : ""}`}
+                onClick={() => onSetActiveTab("questionLog")}
+              >
+                Question log
+              </button>
+            </div>
           </div>
 
-          <section className="operator-panel">
+          <div className="operator-tenant-controls">
+            <label className="operator-tenant-label">
+              <span>Tenant</span>
+              <select
+                className="operator-tenant-select"
+                value={tenantId}
+                onChange={(event) => onTenantChange(event.target.value)}
+                disabled={isTenantsLoading}
+              >
+                {dropdownOptions.map((tenant) => (
+                  <option key={tenant.id} value={tenant.id}>
+                    {tenant.id}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <form className="operator-add-tenant" onSubmit={handleAddTenant}>
+              <input
+                type="text"
+                placeholder="new-tenant-id"
+                value={newTenantId}
+                onChange={(event) => setNewTenantId(event.target.value)}
+                disabled={isAddingTenant}
+                aria-label="New tenant id"
+              />
+              <button
+                type="submit"
+                disabled={isAddingTenant || newTenantId.trim().length === 0}
+              >
+                {isAddingTenant ? "Adding…" : "Add tenant"}
+              </button>
+            </form>
+          </div>
+          {tenantsError ? <p className="operator-error operator-inline-msg">{tenantsError}</p> : null}
+          {addTenantError ? (
+            <p className="operator-error operator-inline-msg">{addTenantError}</p>
+          ) : null}
+        </header>
+
+        <section className="operator-panel">
             {activeTab === "handbook" ? (
               <div className="operator-section">
                 <h2>Handbook</h2>
@@ -271,12 +282,8 @@ export function OperatorPage({
                 ) : null}
               </div>
             ) : null}
-          </section>
         </section>
-      </main >
-      <a className="persistent-nav-button" href={persistentNavTarget.href}>
-        {persistentNavTarget.label}
-      </a>
-    </>
+      </section>
+    </main>
   );
 }
