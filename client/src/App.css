@@ -9,7 +9,7 @@ body,
 .chat-page {
   min-height: 100dvh;
   margin: 0;
-  background: #f7f4ef;
+  background: radial-gradient(ellipse 120% 80% at 50% -20%, #fff3dc 0%, #f7f4ef 42%, #f0e8dc 100%);
   color: #111827;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
     "Helvetica Neue", sans-serif;
@@ -193,6 +193,8 @@ body,
   place-items: center;
   text-align: center;
   padding: 24px;
+  background: radial-gradient(circle at 30% 20%, #fff6e8 0%, #f8eddc 50%, #f0e0cc 100%);
+  color: #3d3428;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
     "Helvetica Neue", sans-serif;
 }
@@ -202,7 +204,12 @@ body,
 }
 
 .route-fallback a {
-  color: #2563eb;
+  color: #b45309;
+  font-weight: 600;
+}
+
+.route-fallback a:hover {
+  color: #92400e;
 }
 
 .route-links {
@@ -216,7 +223,11 @@ body,
   display: grid;
   place-items: center;
   padding: 24px;
-  background: radial-gradient(circle at top, #fff3dc 0%, #f8eddc 45%, #f5e6d1 100%);
+  background:
+    radial-gradient(ellipse 100% 70% at 50% -10%, #ffe8c4 0%, transparent 55%),
+    radial-gradient(circle at 85% 75%, rgba(251, 191, 36, 0.18) 0%, transparent 45%),
+    radial-gradient(circle at 10% 60%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+    linear-gradient(165deg, #fff8ee 0%, #f8eddc 48%, #f0dcc8 100%);
   color: #2d2d2d;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
     "Helvetica Neue", sans-serif;
@@ -295,25 +306,29 @@ body,
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 1px solid #d1d5db;
-  background: #111827;
+  border: 1px solid rgba(180, 83, 9, 0.35);
+  background: linear-gradient(145deg, #f59e0b 0%, #ea580c 100%);
   color: #ffffff;
   padding: 10px 14px;
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
-  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.24);
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35), 0 2px 6px rgba(120, 53, 15, 0.12);
 }
 
 .persistent-nav-button:hover {
-  background: #1f2937;
+  background: linear-gradient(145deg, #fbbf24 0%, #f97316 100%);
+  border-color: rgba(180, 83, 9, 0.45);
 }
 
 .operator-page {
   min-height: 100dvh;
   margin: 0;
-  background: #f8f9fb;
-  color: #333333;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -5%, #ffe8c4 0%, transparent 50%),
+    radial-gradient(circle at 100% 40%, rgba(59, 130, 246, 0.07) 0%, transparent 42%),
+    linear-gradient(180deg, #fdf8f0 0%, #f7f4ef 35%, #f2ebe0 100%);
+  color: #3d3428;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
     "Helvetica Neue", sans-serif;
 }
@@ -322,9 +337,10 @@ body,
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(248, 249, 251, 0.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid #e8eaef;
+  background: rgba(255, 252, 247, 0.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #ecdac0;
+  box-shadow: 0 4px 14px rgba(120, 94, 51, 0.06);
 }
 
 .operator-app-nav {
@@ -334,7 +350,7 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -346,16 +362,28 @@ body,
   border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: #5e4426;
   text-decoration: none;
   border: 1px solid transparent;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  background: rgba(255, 255, 255, 0.45);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .operator-app-nav-link:hover {
   background: #ffffff;
-  border-color: #e5e7eb;
-  color: #111827;
+  border-color: #e8d4bc;
+  color: #422006;
+  box-shadow: 0 2px 8px rgba(120, 94, 51, 0.08);
+}
+
+.operator-app-nav-link--chat:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #1d4ed8;
+}
+
+.operator-app-nav-link--builder:hover {
+  border-color: rgba(5, 150, 105, 0.35);
+  color: #047857;
 }
 
 .operator-app-nav-current {
@@ -367,8 +395,9 @@ body,
   font-size: 0.875rem;
   font-weight: 600;
   color: #ffffff;
-  background: #111827;
-  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08);
+  background: linear-gradient(145deg, #78350f 0%, #92400e 55%, #b45309 100%);
+  border: 1px solid rgba(120, 53, 15, 0.35);
+  box-shadow: 0 4px 14px rgba(120, 53, 15, 0.22);
 }
 
 .operator-shell {
@@ -392,7 +421,7 @@ body,
 
 .operator-header h1 {
   margin: 0;
-  color: #111827;
+  color: #5e4426;
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -402,15 +431,15 @@ body,
   display: inline-flex;
   padding: 3px;
   border-radius: 10px;
-  background: #e8eaef;
-  border: 1px solid #dce0e8;
+  background: #f0e6da;
+  border: 1px solid #e5d5c4;
   gap: 2px;
 }
 
 .operator-segment-btn {
   border: none;
   background: transparent;
-  color: #5b6472;
+  color: #6b5344;
   padding: 8px 14px;
   font-size: 0.875rem;
   font-weight: 600;
@@ -420,14 +449,15 @@ body,
 }
 
 .operator-segment-btn:hover {
-  color: #1f2937;
-  background: rgba(255, 255, 255, 0.65);
+  color: #422006;
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .operator-segment-btn.active {
-  color: #111827;
+  color: #78350f;
   background: #ffffff;
-  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.08);
+  box-shadow: 0 2px 8px rgba(120, 94, 51, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
 
 .operator-tenant-controls {
@@ -446,15 +476,15 @@ body,
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #5b5b5b;
+  color: #5e4a3a;
   font-weight: 500;
 }
 
 .operator-tenant-select {
   padding: 6px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #fff;
+  border: 1px solid #e5d5c4;
+  border-radius: 8px;
+  background: #fffefb;
   font-size: 0.95rem;
   min-width: 180px;
 }
@@ -467,39 +497,47 @@ body,
 
 .operator-add-tenant input {
   padding: 6px 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid #e5d5c4;
+  border-radius: 8px;
   font-size: 0.95rem;
   min-width: 180px;
+  background: #fffefb;
 }
 
 .operator-add-tenant button {
-  padding: 6px 12px;
-  border: 1px solid #2563eb;
-  border-radius: 6px;
-  background: #2563eb;
+  padding: 6px 14px;
+  border: 1px solid rgba(180, 83, 9, 0.4);
+  border-radius: 8px;
+  background: linear-gradient(145deg, #f59e0b 0%, #ea580c 100%);
   color: #fff;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25);
+}
+
+.operator-add-tenant button:hover:not(:disabled) {
+  background: linear-gradient(145deg, #fbbf24 0%, #f97316 100%);
 }
 
 .operator-add-tenant button:disabled {
-  background: #93c5fd;
-  border-color: #93c5fd;
+  background: #fcd9bd;
+  border-color: #fed7aa;
+  color: #9a3412;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .operator-panel {
-  background: #ffffff;
-  border: 1px solid #e8eaef;
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #ecdac0;
+  border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04);
+  box-shadow: 0 8px 28px rgba(120, 94, 51, 0.1);
 }
 
 .operator-section h2 {
   margin: 0 0 12px;
-  color: #2f2f2f;
+  color: #5e4426;
   font-size: 1.1rem;
 }
 
@@ -578,11 +616,11 @@ body,
 }
 
 .logs-table tbody tr {
-  background: #f7f7f7;
+  background: #fdf8f2;
 }
 
 .logs-table tbody tr:nth-child(even) {
-  background: #f2f2f2;
+  background: #f5ede4;
 }
 
 .sr-only {

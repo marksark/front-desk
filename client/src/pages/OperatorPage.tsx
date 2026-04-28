@@ -106,13 +106,13 @@ export function OperatorPage({
     <main className="operator-page">
       <div className="operator-topbar">
         <nav className="operator-app-nav" aria-label="Main pages">
-          <a className="operator-app-nav-link" href="/chat">
+          <a className="operator-app-nav-link operator-app-nav-link--chat" href="/chat">
             Parent chat
           </a>
           <span className="operator-app-nav-current" aria-current="page">
             Operator
           </span>
-          <a className="operator-app-nav-link" href="/admin/form-builder">
+          <a className="operator-app-nav-link operator-app-nav-link--builder" href="/admin/form-builder">
             Form builder
           </a>
         </nav>
