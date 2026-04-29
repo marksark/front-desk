@@ -1,3 +1,6 @@
 .env
 node_modules
 dist
+
+# Local screen recordings and other demo assets (keep out of git)
+artifacts/
