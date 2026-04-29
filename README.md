@@ -51,6 +51,10 @@ npm run dev
 Client runs at `http://localhost:3000`
 Server runs at `http://localhost:3001`
 
+### Local UI recordings
+
+Save screen captures or walkthrough videos under `artifacts/`. That folder is listed in `.gitignore`, so demos stay on your machine and are not committed.
+
 ---
 
 ## Usage
